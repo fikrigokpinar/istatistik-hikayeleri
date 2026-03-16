@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="tr" style="color-scheme: light only;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bölüm II — Ev Fiyatı Kehanet mi, Regresyon mu? | İstatistik Hikayeleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --aged: #e8e0cc;
+    --accent: #b5292a;
+    --accent2: #1e3a5f;
+    --gold: #b8860b;
+    --muted: #7a6f5a;
+    --math-bg: #f0f4ef;
+    --math-border: #2d6a4f;
+    --highlight: #fff3cd;
+    --green: #1a6b3a;
+    color-scheme: light only;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--aged) !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px; line-height: 1.85;
+    min-height: 100vh;
+  }
+
+  /* KİLİT EKRANI */
+  #lockScreen {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--ink);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 40px;
+  }
+  #lockScreen.active { display: flex; }
+  .lock-screen-icon { font-size: 64px; margin-bottom: 24px; }
+  .lock-screen-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; color: var(--paper);
+    margin-bottom: 12px;
+  }
+  .lock-screen-desc {
+    font-size: 16px; color: rgba(245,240,232,0.55);
+    max-width: 400px; line-height: 1.7; margin-bottom: 32px;
+  }
+  .lock-screen-btn {
+    display: inline-block;
+    background: var(--gold); color: var(--ink);
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    padding: 14px 36px; border-radius: 8px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .lock-screen-btn:hover { opacity: 0.85; }
+
+  /* NAV */
+  nav {
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 52px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--paper); text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .nav-brand span { color: var(--gold); }
+  .nav-back {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.55);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+
+  /* PROGRESS BAR */
+  .progress-bar { height: 4px; background: rgba(184,134,11,0.15); }
+  .progress-fill {
+    height: 100%; background: var(--gold);
+    width: 33.3%; transition: width 0.6s ease;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; padding: 56px 40px 100px; }
+
+  .chapter-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chapter-eyebrow::before {
+    content: ''; width: 24px; height: 1px;
+    background: var(--gold); display: inline-block;
+  }
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px; font-weight: 700;
+    line-height: 1.15; margin-bottom: 8px;
+    opacity: 0; animation: fadeUp 0.8s 0.1s ease forwards;
+  }
+  .chapter-subtitle {
+    font-size: 16px; font-style: italic;
+    color: var(--muted); margin-bottom: 48px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  /* Önceki bölüm rozeti */
+  .prev-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(26,107,58,0.1);
+    border: 1px solid rgba(26,107,58,0.25);
+    border-radius: 20px; padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--green); margin-bottom: 32px;
+    text-decoration: none;
+  }
+  .prev-badge:hover { background: rgba(26,107,58,0.18); }
+
+  .character-card {
+    background: white;
+    border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 40px 0;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 3px 3px 0 var(--aged);
+  }
+  .character-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .character-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; margin-bottom: 4px;
+  }
+  .character-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  p { margin-bottom: 1.4em; }
+
+  .divider {
+    display: flex; align-items: center; gap: 16px; margin: 28px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider-symbol { color: var(--gold); font-size: 16px; }
+
+  .dialogue {
+    margin: 20px 0; padding: 0 0 0 20px;
+    border-left: 3px solid var(--aged);
+  }
+  .speaker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 3px;
+  }
+  .speech { font-style: italic; color: #2a2015; }
+
+  .stat-box {
+    background: var(--math-bg);
+    border: 1px solid var(--math-border);
+    border-radius: 8px; padding: 24px 28px;
+    margin: 32px 0; position: relative; overflow: hidden;
+  }
+  .stat-box::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--math-border);
+  }
+  .stat-box .box-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--math-border);
+    text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stat-box .box-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--math-border); opacity: 0.3;
+  }
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; background: white;
+    padding: 12px 16px; border-radius: 4px;
+    margin: 10px 0; border: 1px solid rgba(45,106,79,0.2);
+    overflow-x: auto; line-height: 1.7; color: var(--ink);
+  }
+  .formula .comment { color: var(--muted); font-size: 12px; }
+
+  .data-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  .data-table th {
+    background: var(--accent2); color: white;
+    padding: 9px 12px; text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.05em;
+  }
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(44,95,138,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--ink);
+  }
+  .data-table tr:nth-child(even) td { background: rgba(44,95,138,0.04); }
+  .data-table .hl td { background: var(--highlight); font-weight: 600; }
+
+  .thinking-box {
+    background: white; border: 1px dashed var(--gold);
+    border-radius: 8px; padding: 18px 22px;
+    margin: 24px 0; position: relative;
+  }
+  .thinking-box::before {
+    content: '💭'; position: absolute;
+    top: -13px; left: 18px; font-size: 20px;
+    background: var(--aged); padding: 0 6px;
+  }
+  .thinking-box .thinking-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+  .thinking-box p { margin-bottom: 0.5em; font-size: 16px; color: #2a2015; }
+
+  .conclusion-box {
+    background: linear-gradient(135deg, #2c3e50, #1a252f);
+    color: #f0ece0; padding: 28px 32px;
+    border-radius: 12px; margin: 36px 0;
+    border: 1px solid rgba(184,134,11,0.4);
+  }
+  .conclusion-box .conclusion-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: #f0c040; margin-bottom: 10px;
+  }
+  .conclusion-box .conclusion-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-style: italic;
+    line-height: 1.6; color: #f0ece0;
+  }
+
+  .exercise-box {
+    border: 2px solid var(--accent);
+    border-radius: 12px; padding: 24px 28px; margin: 40px 0 0;
+  }
+  .exercise-box .ex-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  }
+  .ex-badge {
+    background: var(--accent); color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  }
+  .ex-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700;
+  }
+  .exercise-box ol { padding-left: 22px; }
+  .exercise-box ol li { margin-bottom: 12px; line-height: 1.7; }
+  .hint {
+    background: #fffbeb; border: 1px solid #f59e0b;
+    border-radius: 6px; padding: 12px 16px;
+    margin-top: 18px; font-size: 14px; color: #92400e;
+  }
+  .hint::before { content: '💡 İpucu: '; font-weight: 600; }
+
+  /* KİLİT SİSTEMİ */
+  .unlock-section {
+    margin-top: 48px; background: white;
+    border: 2px solid var(--ink); border-radius: 12px; overflow: hidden;
+  }
+  .unlock-header {
+    background: var(--ink); padding: 20px 28px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .lock-icon { font-size: 26px; }
+  .unlock-header-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; color: var(--paper); margin-bottom: 2px;
+  }
+  .unlock-header-text p {
+    font-size: 13px; color: rgba(245,240,232,0.55); font-style: italic; margin: 0;
+  }
+  .unlock-body { padding: 28px; }
+  .unlock-question {
+    background: var(--math-bg);
+    border-left: 4px solid var(--math-border);
+    padding: 16px 20px; border-radius: 0 8px 8px 0;
+    margin-bottom: 24px; font-size: 16px; line-height: 1.7; color: var(--ink);
+  }
+  .unlock-question strong { color: var(--math-border); }
+  .unlock-input-row {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .unlock-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); white-space: nowrap;
+  }
+  .unlock-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    width: 110px; text-align: center;
+    padding: 10px 12px;
+    border: 2px solid #d4c9b0; border-radius: 8px;
+    background: white; color: var(--ink); outline: none;
+    transition: border-color 0.2s;
+  }
+  .unlock-input:focus { border-color: var(--math-border); }
+  .unlock-input.error { border-color: var(--accent); animation: shake 0.4s ease; }
+  .unlock-input.success { border-color: var(--green); }
+  .unlock-btn {
+    background: var(--math-border); color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 12px 24px; border: none; border-radius: 8px;
+    cursor: pointer; transition: background 0.2s, transform 0.1s;
+  }
+  .unlock-btn:hover { background: #1a4a35; }
+  .unlock-btn:active { transform: scale(0.97); }
+  .unlock-feedback {
+    margin-top: 14px; font-size: 15px; min-height: 24px;
+    font-style: italic; color: var(--muted);
+  }
+  .unlock-feedback.wrong { color: var(--accent); }
+  .unlock-feedback.correct { color: var(--green); font-weight: 600; }
+
+  .next-chapter-unlocked {
+    display: none; margin-top: 28px;
+    background: linear-gradient(135deg, #1a6b3a, #0f4a28);
+    border-radius: 10px; padding: 24px 28px; text-align: center;
+  }
+  .next-chapter-unlocked.visible { display: block; animation: fadeUp 0.6s ease forwards; }
+  .next-unlocked-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); margin-bottom: 8px;
+  }
+  .next-unlocked-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-style: italic; color: white;
+    margin-bottom: 20px; line-height: 1.4;
+  }
+  .next-btn {
+    display: inline-block; background: white; color: #1a6b3a;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    padding: 14px 36px; border-radius: 8px; text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+
+  .completed-badge {
+    display: none; background: rgba(26,107,58,0.1);
+    border: 1px solid rgba(26,107,58,0.3); border-radius: 8px;
+    padding: 12px 20px; margin-top: 16px; font-size: 14px;
+    color: var(--green); font-style: italic; text-align: center;
+  }
+  .completed-badge.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 36px 20px 80px; }
+    .chapter-title { font-size: 28px; }
+    nav { padding: 0 20px; }
+    .unlock-input-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- KİLİT EKRANI — JS ile kontrol edilir -->
+<div id="lockScreen">
+  <div class="lock-screen-icon">🔒</div>
+  <div class="lock-screen-title">Bu Bölüm Kilitli</div>
+  <div class="lock-screen-desc">
+    Bölüm II'yi okumak için önce Bölüm I'i tamamlaman gerekiyor. Alıştırmayı çöz, kilidi aç.
+  </div>
+  <a href="bolum1.html" class="lock-screen-btn">← Bölüm I'e Git</a>
+</div>
+
+<nav>
+  <a class="nav-brand" href="index.html"><span>İ</span>statistik Hikayeleri</a>
+  <a class="nav-back" href="index.html">← Ana Sayfa</a>
+</nav>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="page">
+
+  <a href="bolum1.html" class="prev-badge">✓ Bölüm I tamamlandı &nbsp;·&nbsp; Bölüm II →</a>
+
+  <div class="chapter-eyebrow">Bölüm II</div>
+  <h1 class="chapter-title">Ev Fiyatı Kehanet mi,<br>Regresyon mu?</h1>
+  <p class="chapter-subtitle">Doğrusal regresyon, tahmin ve modelin sınırları üzerine</p>
+
+  <div class="character-card">
+    <div class="label">Bu bölümün karakterleri</div>
+    <div class="character-name">Defne Arslan</div>
+    <div class="character-desc">Yine o. Bu sefer masasında Ankara'nın mahalle verilerini inceliyor.</div>
+    <div style="margin-top:14px">
+      <div class="character-name">Cengiz Bey</div>
+      <div class="character-desc">Ankara'nın Çankaya ilçesinde 12 yıldır emlakçılık yapıyor. Modeli tutmuyor, neden anlamıyor.</div>
+    </div>
+  </div>
+
+  <p>Sabahın dokuzuydu. Defne Hoca henüz çayını bile içmemişti ki kapıda bir adam belirdi — elinde bir dosya, yüzünde "bir şeyler ters gidiyor" ifadesi.</p>
+
+  <div class="dialogue">
+    <div class="speaker">Cengiz Bey</div>
+    <div class="speech">"Hocam, beni bir mühendis arkadaş yönlendirdi size. Şöyle bir sorunum var: internette bir formül buldum, metrekare ile fiyatı ilişkilendiriyor. Uyguladım, tahminlerim tutmuyor. Bazen çok yüksek, bazen çok düşük."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Formülü kendiniz mi oluşturdunuz, yoksa hazır mı buldunuz?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Cengiz Bey</div>
+    <div class="speech">"Hazır. 'Fiyat = 8500 × metrekare' diyordu bir sitede."</div>
+  </div>
+
+  <p>Defne duraksadı. Sonra yavaşça, "Oturun" dedi.</p>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <p>Cengiz Bey'in getirdiği dosyada son üç ayda Çankaya'da satılan 10 dairenin verileri vardı.</p>
+
+  <div class="stat-box">
+    <div class="box-title">📋 Veri — Çankaya Daire Satışları</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Daire</th><th>Metrekare (x)</th><th>Fiyat (₺, bin)</th><th>8500×m² tahmini</th><th>Fark</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>65</td><td>680</td><td>552</td><td style="color:var(--accent)">+128</td></tr>
+        <tr><td>2</td><td>90</td><td>890</td><td>765</td><td style="color:var(--accent)">+125</td></tr>
+        <tr><td>3</td><td>75</td><td>740</td><td>637</td><td style="color:var(--accent)">+103</td></tr>
+        <tr><td>4</td><td>110</td><td>1050</td><td>935</td><td style="color:var(--accent)">+115</td></tr>
+        <tr><td>5</td><td>55</td><td>590</td><td>467</td><td style="color:var(--accent)">+123</td></tr>
+        <tr><td>6</td><td>130</td><td>1240</td><td>1105</td><td style="color:var(--accent)">+135</td></tr>
+        <tr><td>7</td><td>85</td><td>820</td><td>722</td><td style="color:var(--accent)">+98</td></tr>
+        <tr><td>8</td><td>95</td><td>940</td><td>807</td><td style="color:var(--accent)">+133</td></tr>
+        <tr><td>9</td><td>70</td><td>710</td><td>595</td><td style="color:var(--accent)">+115</td></tr>
+        <tr class="hl"><td>10</td><td>120</td><td>1150</td><td>1020</td><td style="color:var(--accent)">+130</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="thinking-box">
+    <div class="thinking-label">Defne düşünüyor</div>
+    <p>Her tahmin düşük kalıyor. Sabit bir miktar — ortalama ~120 bin lira.</p>
+    <p>Bu ne demek? Formülde <strong>sabit terim eksik!</strong></p>
+    <p>Doğru model: Fiyat = β₀ + β₁ × metrekare</p>
+    <p>β₀ sıfırdan farklı — bu "temel maliyet", metrekareye bağlı değil.</p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Cengiz Bey, gördünüz mü? Her tahmin yaklaşık 120 bin düşük kalıyor. Çünkü formül sıfırdan başlatıyor. Ama gerçekte küçük bir dairenin bile konum, kat, asansör gibi sabit maliyetleri var."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Cengiz Bey</div>
+    <div class="speech">"Peki doğru formül nasıl bulunur?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"En Küçük Kareler yöntemi. Hata karelerinin toplamını minimize eden β₀ ve β₁'i buluyoruz."</div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="stat-box">
+    <div class="box-title">📐 En Küçük Kareler — Hesaplama</div>
+    <p style="margin-bottom:12px;font-size:15px;">n=10 gözlem için:</p>
+    <div class="formula">
+x̄ = (65+90+75+110+55+130+85+95+70+120)/10 = <strong>89.5</strong>
+ȳ = (680+890+740+1050+590+1240+820+940+710+1150)/10 = <strong>881</strong>
+    </div>
+    <div class="formula">
+β̂₁ = Σ(xᵢ - x̄)(yᵢ - ȳ) / Σ(xᵢ - x̄)²
+    = 47225 / 4722.5
+    ≈ <strong>10.00</strong>  <span class="comment">← her m² için ~10 bin ₺</span>
+    </div>
+    <div class="formula">
+β̂₀ = ȳ - β̂₁ · x̄
+    = 881 - 10.00 × 89.5
+    ≈ <strong>-14</strong>  <span class="comment">← sabit terim</span>
+    </div>
+    <p style="margin-top:14px;font-size:15px;color:var(--math-border);">
+      <strong>Model: Fiyat ≈ -14 + 10.00 × metrekare</strong>
+    </p>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">📊 Model Karşılaştırması</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Daire</th><th>Gerçek (bin ₺)</th><th>Eski Tahmin</th><th>Yeni Tahmin</th><th>Yeni Hata</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 (65m²)</td><td>680</td><td>552</td><td>636</td><td style="color:var(--math-border)">+44</td></tr>
+        <tr><td>4 (110m²)</td><td>1050</td><td>935</td><td>1086</td><td style="color:var(--accent)">-36</td></tr>
+        <tr><td>6 (130m²)</td><td>1240</td><td>1105</td><td>1286</td><td style="color:var(--accent)">-46</td></tr>
+        <tr class="hl"><td>10 (120m²)</td><td>1150</td><td>1020</td><td>1186</td><td style="color:var(--accent)">-36</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;font-size:14px;color:var(--muted);">Hatalar küçüldü ama sıfır değil. R² ≈ 0.98 — metrekare fiyatın %98'ini açıklıyor.</p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Cengiz Bey</div>
+    <div class="speech">"Peki bu model her zaman işe yarar mı?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Hayır, ve bu çok önemli. Bakın — model sadece metrekareyi kullanıyor. Ama fiyatı etkileyen başka şeyler de var: kat, yaş, mahalle, metro uzaklığı. R²=0.98 iyi görünüyor ama bu veri Çankaya'ya özgü. Ataşehir'de aynı formülü kullanırsanız yanılırsınız."</div>
+  </div>
+
+  <div class="conclusion-box">
+    <div class="conclusion-label">Bu bölümün dersi</div>
+    <div class="conclusion-text">
+      "Regresyon modeli verinizle doğrusal bir ilişki kurar — ama modelin ne söylemediğini anlamak, ne söylediğini anlamak kadar önemlidir."
+      <div style="margin-top:14px;font-size:13px;font-style:normal;color:#c8bfa8;letter-spacing:0.05em">— Defne Arslan</div>
+    </div>
+  </div>
+
+  <!-- ALIŞTIRMA -->
+  <div class="exercise-box">
+    <div class="ex-header">
+      <span class="ex-badge">Alıştırma</span>
+      <span class="ex-title">Şimdi sıra sende</span>
+    </div>
+    <ol>
+      <li>Yeni modeli kullanarak <strong>100m²</strong> bir dairenin fiyatını tahmin edin. (Model: Fiyat ≈ -14 + 10×m²)</li>
+      <li>R²=0.98 ne anlama gelir? Kalan %2'yi ne açıklıyor olabilir?</li>
+      <li><em>(Zorlayıcı)</em> Modele ikinci bir değişken olarak "kat numarası" eklesek bu nasıl bir model olurdu? Adını söyleyin.</li>
+    </ol>
+    <div class="hint">Model: Fiyat ≈ -14 + 10 × m² &nbsp;|&nbsp; 100m² için: -14 + 10×100 = ?</div>
+  </div>
+
+  <!-- KİLİT SİSTEMİ -->
+  <div class="unlock-section" id="unlockSection">
+    <div class="unlock-header">
+      <div class="lock-icon" id="lockIcon">🔒</div>
+      <div class="unlock-header-text">
+        <h3>Bölüm III'ün Kilidi</h3>
+        <p>Soruyu çöz, cevabı gir, bir sonraki bölüm açılsın</p>
+      </div>
+    </div>
+    <div class="unlock-body">
+      <div class="unlock-question">
+        Modeli kullanarak <strong>100m²</strong> bir dairenin fiyat tahminini hesaplayın.<br><br>
+        <strong>Fiyat = -14 + 10 × 100 = ?</strong><br><br>
+        Sonucu <strong>bin ₺ cinsinden tam sayı</strong> olarak girin.
+        <br><em style="font-size:14px;color:var(--muted);">(Örnek: 986 bin ₺ ise → 986 girin)</em>
+      </div>
+
+      <div class="unlock-input-row">
+        <span class="unlock-label">Tahmin =</span>
+        <input type="number" class="unlock-input" id="unlockInput" placeholder="?" min="0" max="9999">
+        <span class="unlock-label">bin ₺</span>
+        <button class="unlock-btn" onclick="checkAnswer()">Kontrol Et →</button>
+      </div>
+
+      <div class="unlock-feedback" id="unlockFeedback"></div>
+
+      <div class="next-chapter-unlocked" id="nextChapter">
+        <div class="next-unlocked-label">🎉 Doğru! Bölüm III kilidi açıldı</div>
+        <div class="next-unlocked-title">"İki İlaç, Bir Soru"<br>
+          <span style="font-size:15px;font-style:normal;opacity:0.8">Bir ilaç şirketi klinik veriyle kapıya geliyor…</span>
+        </div>
+        <a href="bolum3.html" class="next-btn">Bölüm III'e Geç →</a>
+      </div>
+
+      <div class="completed-badge" id="completedBadge">
+        ✓ Bu bölümü daha önce tamamladınız — Bölüm III zaten açık!
+        <br><a href="bolum3.html" style="color:var(--green);font-weight:600;">Bölüm III'e Git →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Bölüm 1 tamamlanmadıysa kilitle
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('bolum1_completed') !== 'true') {
+      document.getElementById('lockScreen').classList.add('active');
+    }
+
+    // Bölüm 2 daha önce tamamlandıysa
+    if (localStorage.getItem('bolum2_completed') === 'true') {
+      document.getElementById('completedBadge').classList.add('visible');
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+    }
+  });
+
+  function checkAnswer() {
+    const input = document.getElementById('unlockInput');
+    const feedback = document.getElementById('unlockFeedback');
+    const val = parseInt(input.value.trim());
+
+    // Doğru cevap: -14 + 10×100 = 986
+    const correct = [986];
+
+    input.classList.remove('error', 'success');
+
+    if (isNaN(val)) {
+      feedback.textContent = 'Lütfen bir sayı girin.';
+      feedback.className = 'unlock-feedback wrong';
+      return;
+    }
+
+    if (correct.includes(val)) {
+      input.classList.add('success');
+      feedback.textContent = 'Doğru! 986 bin ₺ — peki gerçek fiyat 940 bin olan daire 4 kaç hata veriyor?';
+      feedback.className = 'unlock-feedback correct';
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+      localStorage.setItem('bolum2_completed', 'true');
+      const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+      progress.bolum2 = true;
+      localStorage.setItem('progress', JSON.stringify(progress));
+    } else {
+      input.classList.add('error');
+      const hints = [
+        'Yanlış. Formül: Fiyat = -14 + 10 × metrekare. Metrekare = 100.',
+        'Tekrar dene. 10 × 100 = 1000, sonra 1000 - 14 = ?',
+      ];
+      const attempt = parseInt(localStorage.getItem('b2_attempts') || '0');
+      feedback.textContent = hints[Math.min(attempt, hints.length-1)];
+      feedback.className = 'unlock-feedback wrong';
+      localStorage.setItem('b2_attempts', attempt + 1);
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  document.getElementById('unlockInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkAnswer();
+  });
+</script>
+</body>
+</html>

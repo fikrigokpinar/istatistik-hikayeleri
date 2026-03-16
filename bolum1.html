@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
-<html lang="tr" style="background:#e8e0cc; color-scheme: light only;">
+<html lang="tr" style="color-scheme: light only;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Defne Arslan — Bölüm 1: Gol mu, Şans mı?</title>
+<title>Bölüm I — Gol mu, Şans mı? | İstatistik Hikayeleri</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -18,694 +17,653 @@
     --math-bg: #eef4f9;
     --math-border: #2c5f8a;
     --highlight: #fff3cd;
+    --green: #1a6b3a;
+    color-scheme: light only;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--aged) !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.85;
+    min-height: 100vh;
   }
 
-- { margin: 0; padding: 0; box-sizing: border-box; }
+  /* NAV */
+  nav {
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 52px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--paper); text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .nav-brand span { color: var(--gold); }
+  .nav-back {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.55);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
 
-/* Force light mode regardless of system dark mode */
-:root { color-scheme: light only; }
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: rgba(184,134,11,0.15);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 16.6%; /* 1/6 */
+    transition: width 0.6s ease;
+  }
 
-body {
-background: var(–aged) !important;
-color: var(–ink) !important;
-font-family: ‘Source Serif 4’, Georgia, serif;
-font-size: 18px;
-line-height: 1.85;
-min-height: 100vh;
-}
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 40px 100px;
+  }
 
-/* Kağıt dokusu efekti */
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image:
-url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘400’ height=‘400’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3CfeColorMatrix type=‘saturate’ values=‘0’/%3E%3C/filter%3E%3Crect width=‘400’ height=‘400’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 0;
-opacity: 0.6;
-}
+  /* CHAPTER HEADER */
+  .chapter-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chapter-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; font-weight: 700;
+    line-height: 1.15; margin-bottom: 8px;
+    opacity: 0; animation: fadeUp 0.8s 0.1s ease forwards;
+  }
+  .chapter-subtitle {
+    font-size: 16px; font-style: italic;
+    color: var(--muted); margin-bottom: 48px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+  }
 
-.page {
-max-width: 720px;
-margin: 0 auto;
-padding: 60px 40px 100px;
-position: relative;
-z-index: 1;
-}
+  /* CHARACTER CARD */
+  .character-card {
+    background: white;
+    border-left: 4px solid var(--accent);
+    padding: 20px 24px;
+    margin: 40px 0;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 3px 3px 0 var(--aged);
+  }
+  .character-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .character-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; margin-bottom: 4px;
+  }
+  .character-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-/* Seri başlığı */
-.series-header {
-text-align: center;
-margin-bottom: 60px;
-opacity: 0;
-animation: fadeUp 0.8s ease forwards;
-}
+  /* STORY */
+  p { margin-bottom: 1.4em; }
 
-.series-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 13px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 8px;
-}
+  .divider {
+    display: flex; align-items: center; gap: 16px; margin: 28px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider-symbol { color: var(--gold); font-size: 16px; }
 
-.series-name {
-font-family: ‘Playfair Display’, serif;
-font-size: 28px;
-font-weight: 700;
-color: var(–accent);
-margin-bottom: 4px;
-}
+  .dialogue {
+    margin: 20px 0; padding: 0 0 0 20px;
+    border-left: 3px solid var(--aged);
+  }
+  .speaker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    margin-bottom: 3px;
+  }
+  .speech { font-style: italic; color: #2a2015; }
 
-.series-subtitle {
-font-size: 14px;
-color: var(–muted);
-font-style: italic;
-}
+  /* STAT BOXES */
+  .stat-box {
+    background: var(--math-bg);
+    border: 1px solid var(--math-border);
+    border-radius: 8px; padding: 24px 28px;
+    margin: 32px 0; position: relative; overflow: hidden;
+  }
+  .stat-box::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--math-border);
+  }
+  .stat-box .box-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--accent2);
+    text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stat-box .box-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--math-border); opacity: 0.3;
+  }
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; background: white;
+    padding: 12px 16px; border-radius: 4px;
+    margin: 10px 0; border: 1px solid rgba(44,95,138,0.2);
+    overflow-x: auto; line-height: 1.7;
+    color: var(--ink);
+  }
+  .formula .comment { color: var(--muted); font-size: 12px; }
 
-.divider {
-display: flex;
-align-items: center;
-gap: 16px;
-margin: 32px 0;
-}
+  .data-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  .data-table th {
+    background: var(--accent2); color: white;
+    padding: 9px 12px; text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.05em;
+  }
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(44,95,138,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--ink);
+  }
+  .data-table tr:nth-child(even) td { background: rgba(44,95,138,0.04); }
+  .data-table .hl td { background: var(--highlight); font-weight: 600; }
 
-.divider::before, .divider::after {
-content: ‘’;
-flex: 1;
-height: 1px;
-background: linear-gradient(to right, transparent, var(–gold), transparent);
-}
+  .thinking-box {
+    background: white; border: 1px dashed var(--gold);
+    border-radius: 8px; padding: 18px 22px;
+    margin: 24px 0; position: relative;
+  }
+  .thinking-box::before {
+    content: '💭'; position: absolute;
+    top: -13px; left: 18px; font-size: 20px;
+    background: var(--aged); padding: 0 6px;
+  }
+  .thinking-box .thinking-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+  .thinking-box p { margin-bottom: 0.5em; font-size: 16px; color: #2a2015; }
 
-.divider-symbol {
-color: var(–gold);
-font-size: 18px;
-}
+  .conclusion-box {
+    background: linear-gradient(135deg, #2c3e50, #1a252f);
+    color: #f0ece0; padding: 28px 32px;
+    border-radius: 12px; margin: 36px 0;
+    border: 1px solid rgba(184,134,11,0.4);
+  }
+  .conclusion-box .conclusion-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: #f0c040; margin-bottom: 10px;
+  }
+  .conclusion-box .conclusion-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-style: italic;
+    line-height: 1.6; color: #f0ece0;
+  }
 
-/* Bölüm başlığı */
-.chapter-header {
-opacity: 0;
-animation: fadeUp 0.8s 0.2s ease forwards;
-margin-bottom: 48px;
-}
+  /* EXERCISE BOX */
+  .exercise-box {
+    border: 2px solid var(--accent);
+    border-radius: 12px; padding: 24px 28px; margin: 40px 0 0;
+  }
+  .exercise-box .ex-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  }
+  .ex-badge {
+    background: var(--accent); color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  }
+  .ex-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700;
+  }
+  .exercise-box ol { padding-left: 22px; }
+  .exercise-box ol li { margin-bottom: 12px; line-height: 1.7; }
+  .hint {
+    background: #fffbeb; border: 1px solid #f59e0b;
+    border-radius: 6px; padding: 12px 16px;
+    margin-top: 18px; font-size: 14px; color: #92400e;
+  }
+  .hint::before { content: '💡 İpucu: '; font-weight: 600; }
 
-.chapter-number {
-font-family: ‘Playfair Display’, serif;
-font-size: 12px;
-letter-spacing: 0.3em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 12px;
-}
+  /* ═══════════════════════════════
+     KİLİT SİSTEMİ
+  ═══════════════════════════════ */
+  .unlock-section {
+    margin-top: 48px;
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+  }
 
-.chapter-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 42px;
-font-weight: 700;
-line-height: 1.2;
-color: var(–ink);
-margin-bottom: 8px;
-}
+  .unlock-header {
+    background: var(--ink);
+    padding: 20px 28px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .lock-icon {
+    font-size: 26px;
+    transition: transform 0.4s ease;
+  }
+  .unlock-header-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; color: var(--paper);
+    margin-bottom: 2px;
+  }
+  .unlock-header-text p {
+    font-size: 13px; color: rgba(245,240,232,0.55);
+    font-style: italic; margin: 0;
+  }
 
-.chapter-subtitle {
-font-size: 16px;
-font-style: italic;
-color: var(–muted);
-}
+  .unlock-body { padding: 28px; }
 
-/* Karakter tanıtım kartı */
-.character-card {
-background: white;
-border-left: 4px solid var(–accent);
-padding: 20px 24px;
-margin: 40px 0;
-border-radius: 0 8px 8px 0;
-box-shadow: 4px 4px 0 var(–aged);
-opacity: 0;
-animation: fadeUp 0.8s 0.4s ease forwards;
-}
+  .unlock-question {
+    background: var(--math-bg);
+    border-left: 4px solid var(--accent2);
+    padding: 16px 20px; border-radius: 0 8px 8px 0;
+    margin-bottom: 24px;
+    font-size: 16px; line-height: 1.7;
+    color: var(--ink);
+  }
+  .unlock-question strong { color: var(--accent2); }
 
-.character-card .label {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 11px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-color: var(–accent);
-margin-bottom: 8px;
-}
+  .unlock-input-row {
+    display: flex; gap: 12px; align-items: center;
+    flex-wrap: wrap;
+  }
 
-.character-name {
-font-family: ‘Playfair Display’, serif;
-font-size: 22px;
-font-weight: 700;
-margin-bottom: 6px;
-}
+  .unlock-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    white-space: nowrap;
+  }
 
-.character-desc {
-font-size: 15px;
-color: var(–muted);
-line-height: 1.6;
-}
+  .unlock-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    width: 100px; text-align: center;
+    padding: 10px 12px;
+    border: 2px solid var(--border, #d4c9b0);
+    border-radius: 8px;
+    background: white; color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .unlock-input:focus { border-color: var(--accent2); }
+  .unlock-input.error { border-color: var(--accent); animation: shake 0.4s ease; }
+  .unlock-input.success { border-color: var(--green); }
 
-/* Ana metin */
-.story-body {
-opacity: 0;
-animation: fadeUp 0.8s 0.6s ease forwards;
-}
+  .unlock-btn {
+    background: var(--accent2); color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 24px; border: none;
+    border-radius: 8px; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .unlock-btn:hover { background: #1a4a73; }
+  .unlock-btn:active { transform: scale(0.97); }
 
-p {
-margin-bottom: 1.4em;
-}
+  .unlock-feedback {
+    margin-top: 14px; font-size: 15px;
+    min-height: 24px; font-style: italic;
+    color: var(--muted);
+  }
+  .unlock-feedback.wrong { color: var(--accent); }
+  .unlock-feedback.correct { color: var(--green); font-weight: 600; }
 
-/* Diyalog */
-.dialogue {
-margin: 24px 0;
-padding: 0 0 0 24px;
-border-left: 3px solid var(–aged);
-position: relative;
-}
+  /* NEXT CHAPTER — kilitsiz */
+  .next-chapter-unlocked {
+    display: none;
+    margin-top: 28px;
+    background: linear-gradient(135deg, #1a6b3a, #0f4a28);
+    border-radius: 10px; padding: 24px 28px;
+    text-align: center;
+  }
+  .next-chapter-unlocked.visible { display: block; animation: fadeUp 0.6s ease forwards; }
+  .next-unlocked-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+  }
+  .next-unlocked-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-style: italic;
+    color: white; margin-bottom: 20px; line-height: 1.4;
+  }
+  .next-btn {
+    display: inline-block;
+    background: white; color: #1a6b3a;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    padding: 14px 36px; border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  }
 
-.speaker {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 12px;
-letter-spacing: 0.1em;
-text-transform: uppercase;
-color: var(–accent2);
-margin-bottom: 4px;
-}
+  /* Already completed badge */
+  .completed-badge {
+    display: none;
+    background: rgba(26,107,58,0.1);
+    border: 1px solid rgba(26,107,58,0.3);
+    border-radius: 8px; padding: 12px 20px;
+    margin-top: 16px; font-size: 14px;
+    color: var(--green); font-style: italic;
+    text-align: center;
+  }
+  .completed-badge.visible { display: block; }
 
-.speech {
-font-style: italic;
-color: #2a2015;
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
 
-/* İstatistik kutusu */
-.stat-box {
-background: var(–math-bg);
-border: 1px solid var(–math-border);
-border-radius: 8px;
-padding: 28px 32px;
-margin: 36px 0;
-position: relative;
-overflow: hidden;
-}
-
-.stat-box::before {
-content: ‘’;
-position: absolute;
-top: 0; left: 0;
-width: 4px; height: 100%;
-background: var(–math-border);
-}
-
-.stat-box .box-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 14px;
-font-weight: 700;
-letter-spacing: 0.05em;
-color: var(–accent2);
-text-transform: uppercase;
-margin-bottom: 16px;
-display: flex;
-align-items: center;
-gap: 8px;
-}
-
-.stat-box .box-title::after {
-content: ‘’;
-flex: 1;
-height: 1px;
-background: var(–math-border);
-opacity: 0.3;
-}
-
-.formula {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 15px;
-background: white;
-padding: 12px 16px;
-border-radius: 4px;
-margin: 12px 0;
-border: 1px solid rgba(44, 95, 138, 0.2);
-overflow-x: auto;
-line-height: 1.6;
-}
-
-.formula .comment {
-color: var(–muted);
-font-size: 13px;
-}
-
-.data-table {
-width: 100%;
-border-collapse: collapse;
-margin: 16px 0;
-font-size: 15px;
-}
-
-.data-table th {
-background: var(–accent2);
-color: white;
-padding: 10px 14px;
-text-align: left;
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 12px;
-letter-spacing: 0.05em;
-}
-
-.data-table td {
-padding: 9px 14px;
-border-bottom: 1px solid rgba(44, 95, 138, 0.15);
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 14px;
-}
-
-.data-table tr:nth-child(even) td {
-background: rgba(44, 95, 138, 0.05);
-}
-
-.data-table .highlight-row td {
-background: var(–highlight);
-font-weight: 600;
-}
-
-/* Defne’nin düşüncesi */
-.thinking-box {
-background: white;
-border: 1px dashed var(–gold);
-border-radius: 8px;
-padding: 20px 24px;
-margin: 28px 0;
-position: relative;
-}
-
-.thinking-box::before {
-content: ‘💭’;
-position: absolute;
-top: -14px;
-left: 20px;
-font-size: 22px;
-background: var(–aged);
-padding: 0 6px;
-}
-
-.thinking-box .thinking-label {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 11px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-color: var(–gold);
-margin-bottom: 8px;
-}
-
-.thinking-box p {
-margin-bottom: 0.6em;
-font-size: 16px;
-color: #2a2015;
-}
-
-/* Sonuç kutusu */
-.conclusion-box {
-background: linear-gradient(135deg, #2c3e50, #1a252f);
-color: #f0ece0;
-padding: 32px 36px;
-border-radius: 12px;
-margin: 40px 0;
-position: relative;
-overflow: hidden;
-border: 1px solid rgba(184,134,11,0.4);
-}
-
-.conclusion-box::before {
-content: ‘’;
-position: absolute;
-inset: 0;
-background: repeating-linear-gradient(
-45deg,
-transparent,
-transparent 40px,
-rgba(255,255,255,0.015) 40px,
-rgba(255,255,255,0.015) 41px
-);
-}
-
-.conclusion-box .conclusion-label {
-font-family: ‘Playfair Display’, serif;
-font-size: 12px;
-letter-spacing: 0.3em;
-text-transform: uppercase;
-color: #f0c040;
-margin-bottom: 12px;
-}
-
-.conclusion-box .conclusion-text {
-font-family: ‘Playfair Display’, serif;
-font-size: 20px;
-font-style: italic;
-line-height: 1.6;
-color: #f0ece0;
-position: relative;
-z-index: 1;
-}
-
-/* Alıştırma kutusu */
-.exercise-box {
-border: 2px solid var(–accent);
-border-radius: 12px;
-padding: 28px 32px;
-margin: 48px 0 24px;
-}
-
-.exercise-box .ex-header {
-display: flex;
-align-items: center;
-gap: 12px;
-margin-bottom: 20px;
-}
-
-.ex-badge {
-background: var(–accent);
-color: white;
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 11px;
-letter-spacing: 0.1em;
-text-transform: uppercase;
-padding: 4px 12px;
-border-radius: 20px;
-}
-
-.ex-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 18px;
-font-weight: 700;
-}
-
-.exercise-box ol {
-padding-left: 24px;
-}
-
-.exercise-box ol li {
-margin-bottom: 12px;
-line-height: 1.7;
-}
-
-/* İpucu */
-.hint {
-background: #fffbeb;
-border: 1px solid #f59e0b;
-border-radius: 6px;
-padding: 14px 18px;
-margin-top: 20px;
-font-size: 15px;
-color: #92400e;
-}
-
-.hint::before {
-content: ’💡 İpucu: ’;
-font-weight: 600;
-}
-
-/* Sonraki bölüm */
-.next-chapter {
-text-align: center;
-margin-top: 80px;
-padding-top: 40px;
-border-top: 1px solid var(–gold);
-opacity: 0;
-animation: fadeUp 0.8s 1s ease forwards;
-}
-
-.next-label {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 11px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 8px;
-}
-
-.next-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 20px;
-font-style: italic;
-color: var(–accent2);
-}
-
-/* Kenar notu (okuma deneyimi için) */
-.margin-note {
-float: right;
-clear: right;
-width: 180px;
-margin: 0 -220px 20px 20px;
-font-size: 13px;
-line-height: 1.5;
-color: var(–muted);
-font-style: italic;
-border-left: 2px solid var(–gold);
-padding-left: 12px;
-}
-
-@media (max-width: 1000px) {
-.margin-note { display: none; }
-}
-
-@keyframes fadeUp {
-from { opacity: 0; transform: translateY(16px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-.page { padding: 40px 20px 80px; }
-.chapter-title { font-size: 30px; }
-}
+  @media (max-width: 600px) {
+    .page { padding: 36px 20px 80px; }
+    .chapter-title { font-size: 30px; }
+    nav { padding: 0 20px; }
+    .unlock-input-row { flex-direction: column; align-items: flex-start; }
+  }
 </style>
-
 </head>
 <body>
+
+<nav>
+  <a class="nav-brand" href="index.html"><span>İ</span>statistik Hikayeleri</a>
+  <a class="nav-back" href="index.html">← Ana Sayfa</a>
+</nav>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
 <div class="page">
 
-  <div class="series-header">
-    <div class="series-title">İstatistik Hikayeleri</div>
-    <div class="series-name">Defne Arslan Vakası</div>
-    <div class="series-subtitle">Türkiye'den Gerçek Hayat Bulmacaları</div>
-  </div>
-
-  <div class="divider"><span class="divider-symbol">◆</span></div>
-
-  <div class="chapter-header">
-    <div class="chapter-number">Bölüm I</div>
-    <div class="chapter-title">Gol mu,<br>Şans mı?</div>
-    <div class="chapter-subtitle">Hipotez testleri ve sporda istatistik yanılgısı üzerine</div>
-  </div>
+  <div class="chapter-eyebrow">Bölüm I</div>
+  <h1 class="chapter-title">Gol mu, Şans mı?</h1>
+  <p class="chapter-subtitle">Hipotez testleri ve sporda istatistik yanılgısı üzerine</p>
 
   <div class="character-card">
     <div class="label">Bu bölümün karakterleri</div>
     <div class="character-name">Defne Arslan</div>
-    <div class="character-desc">
-      Ankara Üniversitesi İstatistik Bölümü öğretim üyesi. Spor medyasının istatistik hatalarını takip etmekten özel zevk alır. Çayını siyah içer, sabırsız ama adil biridir.
-    </div>
+    <div class="character-desc">Ankara Üniversitesi İstatistik Bölümü öğretim üyesi. Spor medyasının istatistik hatalarını takip etmekten özel zevk alır. Çayını siyah içer.</div>
     <div style="margin-top:14px">
-    <div class="character-name">Mert Kaya</div>
-    <div class="character-desc">
-      Defne Hoca'nın lisans asistanı, 3. sınıf öğrencisi. Galatasaray taraftarı olduğu için bu vakada menfaati olduğu söylenebilir.
-    </div>
+      <div class="character-name">Mert Kaya</div>
+      <div class="character-desc">Defne Hoca'nın lisans asistanı, 3. sınıf öğrencisi. Galatasaray taraftarı olduğu için bu vakada menfaati olduğu söylenebilir.</div>
     </div>
   </div>
 
-  <div class="story-body">
+  <p>Saat öğleden sonra dörttü. Defne Arslan, ofisinin penceresinden Ankara'nın gri gökyüzüne bakıyor, elindeki çayın soğuduğundan habersiz bir Excel tablosunu inceliyordu. Kapı vuruldu.</p>
 
-```
-<p>
-  Saat öğleden sonra dörttü. Defne Arslan, ofisinin penceresinden Ankara'nın gri gökyüzüne bakıyor, elindeki çayın soğuduğundan habersiz bir excel tablosunu inceliyordu. Kapı vuruldu.
-</p>
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Hocam, rahatsız etmeyeyim ama… bir şey sormam lazım. Dün gece arkadaşlarla maç izliyorduk, tartışma çıktı."</div>
+  </div>
 
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Hocam, rahatsız etmeyeyim ama… bir şey sormam lazım. Dün gece arkadaşlarla maç izliyorduk, tartışma çıktı."</div>
-</div>
+  <p>Defne başını kaldırmadan, "Gir" dedi.</p>
 
-<p>
-  Defne başını kaldırmadan, "Gir" dedi.
-</p>
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Trabzonspor bu sezon penaltı atışlarında çok iyi. 10 penaltıdan 9'unu gol yaptılar. Bir arkadaşım diyor ki bu tamamen şans, kaleci iyi savuşturamadı zaten. Ben diyorum ki hayır, bu kesinlikle istatistiksel olarak anlamlı. Haklı mıyım?"</div>
+  </div>
 
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Trabzonspor bu sezon penaltı atışlarında çok iyi. 10 penaltıdan 9'unu gol yaptılar. Bir arkadaşım diyor ki bu tamamen şans, kaleci iyi savuşturamadı zaten. Ben diyorum ki hayır, bu kesinlikle istatistiksel olarak anlamlı. Haklı mıyım?"</div>
-</div>
+  <p>Defne artık tabloya bakmıyordu. Hafifçe güldü.</p>
 
-<p>
-  Defne artık tabloya bakmıyordu. Hafifçe güldü — bu, "ilginç bir soru" güleşiydi.
-</p>
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Otur. Sana bunu nasıl test edeceğini göstereyim. Ama önce söyle: arkadaşın ne demek istiyor tam olarak?"</div>
+  </div>
 
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Otur. Sana bunu nasıl test edeceğini göstereyim. Ama önce söyle: arkadaşın ne demek istiyor tam olarak?"</div>
-</div>
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Diyor ki zaten Süper Lig ortalaması yüzde seksen filan, Trabzon'un yüzde doksanı özel bir şey değil."</div>
+  </div>
 
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Diyor ki zaten Süper Lig ortalaması yüzde seksen filan, Trabzon'un yüzde doksanı özel bir şey değil."</div>
-</div>
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Hmm. Arkadaşın aslında farkında olmadan iyi bir soru sormuş."</div>
+  </div>
 
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Hmm. Arkadaşın aslında farkında olmadan iyi bir soru sormuş."</div>
-</div>
+  <div class="divider"><span class="divider-symbol">—</span></div>
 
-<div class="divider"><span class="divider-symbol">—</span></div>
+  <p>Defne tahtaya kalktı. Ofisinin arka duvarında küçük bir yazı tahtası vardı.</p>
 
-<p>
-  Defne tahtaya kalktı. Ofisinin arka duvarında küçük bir yazı tahtası vardı, üstü eski formüllerle doluydu. Bir köşe sildi.
-</p>
+  <div class="stat-box">
+    <div class="box-title">📊 Problem Kurulumu</div>
+    <p style="margin-bottom:10px;font-size:16px;">Süper Lig'de penaltı başarı oranının <strong>%80</strong> olduğunu biliyoruz.</p>
+    <p style="margin-bottom:10px;font-size:16px;">Trabzonspor bu sezon <strong>10 penaltı attı, 9'u gol oldu</strong>.</p>
+    <p style="font-size:16px;">Soru: <strong>%80 başarı oranına sahip bir takımın 10 penaltıdan 9'unu atması ne kadar olası?</strong></p>
+  </div>
 
-<div class="stat-box">
-  <div class="box-title">📊 Problem Kurulumu</div>
-  <p style="margin-bottom:12px; font-size:16px;">Süper Lig'de penaltı başarı oranının <strong>%80</strong> olduğunu biliyoruz (bu bizim <em>baz oran</em>, yani referans noktamız).</p>
-  <p style="margin-bottom:12px; font-size:16px;">Trabzonspor bu sezon <strong>10 penaltı attı, 9'u gol oldu</strong>.</p>
-  <p style="font-size:16px;">Soru: Bu gerçekten iyi mi, yoksa şans mı? Yani <strong>%80 başarı oranına sahip bir takımın 10 penaltıdan 9'unu atması ne kadar olası?</strong></p>
-</div>
+  <div class="thinking-box">
+    <div class="thinking-label">Defne düşünüyor</div>
+    <p>Her penaltı bağımsız bir deneme. Ya gol ya değil — iki sonuç.</p>
+    <p>Bu bana ne hatırlatıyor? <strong>Binom dağılımı.</strong> X ~ Binomial(n=10, p=0.80)</p>
+    <p>Eğer H₀ doğruysa, 9 veya daha fazla gol görme olasılığı nedir?</p>
+  </div>
 
-<div class="thinking-box">
-  <div class="thinking-label">Defne düşünüyor</div>
-  <p>Her penaltı bağımsız bir deneme. Ya gol ya değil — iki sonuç. Başarı olasılığı p.</p>
-  <p>Bu bana ne hatırlatıyor? <strong>Binom dağılımı.</strong> X ~ Binomial(n=10, p=0.80)</p>
-  <p>Eğer H₀ doğruysa — yani Trabzon'un gerçek başarı oranı da %80'se — 9 veya daha fazla gol görme olasılığı nedir?</p>
-</div>
-
-<div class="stat-box">
-  <div class="box-title">🔬 Hipotez Testi Kurulumu</div>
-
-  <div class="formula">
-```
-
-H₀: p = 0.80   <span class="comment">← “Bu takım ortalamayla aynı”</span>
-H₁: p > 0.80   <span class="comment">← “Bu takım ortalamadan iyi”</span>
-</div>
-
-```
-  <p style="margin: 16px 0 8px; font-size:15px;">Test istatistiği: Gözlemlenen başarı sayısı X = 9</p>
-  <p style="margin-bottom: 8px; font-size:15px;">P-değeri hesabı — "H₀ doğruysa X ≥ 9 görme olasılığı":</p>
-
-  <div class="formula">
-```
-
+  <div class="stat-box">
+    <div class="box-title">🔬 Hipotez Testi</div>
+    <div class="formula">
+H₀: p = 0.80   <span class="comment">← "Bu takım ortalamayla aynı"</span>
+H₁: p > 0.80   <span class="comment">← "Bu takım ortalamadan iyi"</span>
+    </div>
+    <p style="margin:14px 0 8px;font-size:15px;">P-değeri hesabı:</p>
+    <div class="formula">
 P(X ≥ 9 | p=0.80, n=10)
-= P(X=9) + P(X=10)
-= C(10,9)·(0.80)⁹·(0.20)¹ + C(10,10)·(0.80)¹⁰·(0.20)⁰
-= 10 · 0.1342 · 0.20   +   1 · 0.1074 · 1
-= 0.2684                +   0.1074
-<strong>≈ 0.376</strong>
-</div>
-
-```
-  <p style="margin-top:16px; font-size:15px; color: var(--accent2);">
-    <strong>P-değeri ≈ 0.376</strong> — yani yaklaşık <strong>%37.6</strong>
-  </p>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Şimdi bak Mert. P-değeri 0.376. Bu ne demek?"</div>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Yani… eğer Trabzon gerçekten %80'lik bir takımsa, 10 penaltıdan 9'unu atması %37.6 ihtimalde mümkün?"</div>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Tam olarak. Ve bu ihtimal hiç de küçük değil. 0.05'in çok üzerinde."</div>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Yani arkadaşım haklı mı?! Şans mı bu?"</div>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Dikkat et — 'şans' değil, 'istatistiksel olarak anlamlı değil' diyoruz. Bu ince ama önemli bir fark. H₀'ı reddedemiyoruz. Bu 10 penaltılık veriyle, Trabzon'un gerçekten daha iyi olduğunu <em>kanıtlayamıyoruz</em>. Ama bu onların kötü olduğu anlamına da gelmiyor."</div>
-</div>
-
-<div class="stat-box">
-  <div class="box-title">📈 Veri Tablosu — Örneklem Boyutunun Etkisi</div>
-  <p style="margin-bottom: 16px; font-size: 15px;">Aynı oran (%90), farklı örneklem boyutlarında ne olur?</p>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Penaltı Sayısı (n)</th>
-        <th>Gol (X)</th>
-        <th>Oran</th>
-        <th>P-değeri</th>
-        <th>Karar (α=0.05)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>10</td><td>9</td><td>%90</td><td>0.376</td><td>H₀ reddedilemez</td>
-      </tr>
-      <tr>
-        <td>20</td><td>18</td><td>%90</td><td>0.206</td><td>H₀ reddedilemez</td>
-      </tr>
-      <tr>
-        <td>50</td><td>45</td><td>%90</td><td>0.034</td><td style="color:var(--accent); font-weight:600">H₀ reddedilir ✓</td>
-      </tr>
-      <tr class="highlight-row">
-        <td>100</td><td>90</td><td>%90</td><td>0.006</td><td style="color:var(--accent); font-weight:600">H₀ reddedilir ✓✓</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Mert</div>
-  <div class="speech">"Yani takım gerçekten %90'sa ama elimizde az veri varsa, bunu anlayamıyoruz?"</div>
-</div>
-
-<div class="dialogue">
-  <div class="speaker">Defne</div>
-  <div class="speech">"Aynen. Buna <strong>istatistiksel güç</strong> diyoruz. Az veriyle zayıf testler yaparsın. Arkadaşın teknik olarak yanlış değil — ama yanlış soruyu soruyor. 'Bu şans mı?' değil, doğru soru şu: 'Bu kadar az veriyle gerçekten karar verebilir miyiz?'"</div>
-</div>
-
-<div class="conclusion-box">
-  <div class="conclusion-label">Bu bölümün dersi</div>
-  <div class="conclusion-text">
-    "İstatistiksel anlamlılık yoksa 'şans' demek doğru değildir. Bazen elimizdeki verinin yetersiz olduğunu söylemek, en dürüst istatistiksel yanıttır."
-    <div style="margin-top:16px; font-size:14px; font-style:normal; color: #c8bfa8; letter-spacing:0.05em">— Defne Arslan</div>
-  </div>
-</div>
-
-<div class="exercise-box">
-  <div class="ex-header">
-    <span class="ex-badge">Alıştırma</span>
-    <span class="ex-title">Şimdi sıra sende</span>
-  </div>
-  <ol>
-    <li>
-      Fenerbahçe bu sezon 12 penaltıdan 11'ini gol yaptı. Süper Lig ortalamasının %80 olduğunu kabul ederek, tek taraflı hipotez testi yapınız (H₁: p > 0.80). P-değerini hesaplayın.
-    </li>
-    <li>
-      Yukarıdaki tablo incelendiğinde, aynı oran (%90) için n=50 ile n=10 arasındaki p-değeri farkını yorumlayın. Örneklem büyüklüğü neden bu kadar önemlidir?
-    </li>
-    <li>
-      <em>(Zorlayıcı)</em> Eğer bir takımın gerçek başarı oranı %85 ise, bunu %80'den ayırt edebilmek için kaç penaltı gözlemlemeniz gerekir? (α=0.05, güç=0.80 için yaklaşık hesaplama yapınız.)
-    </li>
-  </ol>
-  <div class="hint">Binom olasılık formülü: P(X=k) = C(n,k) · pᵏ · (1-p)ⁿ⁻ᵏ</div>
-</div>
-```
-
+  = P(X=9) + P(X=10)
+  = 10·(0.80)⁹·(0.20)¹ + 1·(0.80)¹⁰
+  = 10·0.1342·0.20   +   0.1074
+  = 0.2684            +   0.1074
+  <strong>≈ 0.3758</strong>
+    </div>
+    <p style="margin-top:14px;font-size:15px;color:var(--accent2);">
+      <strong>P-değeri ≈ 0.376</strong> — yani yaklaşık <strong>%37.6</strong>
+    </p>
   </div>
 
-  <div class="next-chapter">
-    <div class="next-label">Sıradaki bölüm</div>
-    <div class="next-title">"Bölüm II: Ev Fiyatı Kehanet mi, Regresyon mu?"<br><span style="font-size:16px; color: var(--muted)">Ankara'da bir emlakçı Defne'nin kapısını çalar…</span></div>
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"P-değeri 0.376. Bu ne demek?"</div>
+  </div>
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Yani… eğer Trabzon gerçekten %80'lik bir takımsa, 10 penaltıdan 9'unu atması %37.6 ihtimalde mümkün?"</div>
+  </div>
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Tam olarak. Ve bu ihtimal hiç de küçük değil — 0.05'in çok üzerinde. H₀'ı reddedemiyoruz."</div>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">📈 Örneklem Boyutunun Etkisi</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>n</th><th>X</th><th>Oran</th><th>P-değeri</th><th>Karar (α=0.05)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>10</td><td>9</td><td>%90</td><td>0.376</td><td>H₀ reddedilemez</td></tr>
+        <tr><td>20</td><td>18</td><td>%90</td><td>0.206</td><td>H₀ reddedilemez</td></tr>
+        <tr><td>50</td><td>45</td><td>%90</td><td>0.034</td><td style="color:var(--accent);font-weight:600">H₀ reddedilir ✓</td></tr>
+        <tr class="hl"><td>100</td><td>90</td><td>%90</td><td>0.006</td><td style="color:var(--accent);font-weight:600">H₀ reddedilir ✓✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Az veriyle zayıf testler yaparsın. Doğru soru şu: 'Bu kadar az veriyle gerçekten karar verebilir miyiz?'"</div>
+  </div>
+
+  <div class="conclusion-box">
+    <div class="conclusion-label">Bu bölümün dersi</div>
+    <div class="conclusion-text">
+      "İstatistiksel anlamlılık yoksa 'şans' demek doğru değildir. Bazen elimizdeki verinin yetersiz olduğunu söylemek, en dürüst istatistiksel yanıttır."
+      <div style="margin-top:14px;font-size:13px;font-style:normal;color:#c8bfa8;letter-spacing:0.05em">— Defne Arslan</div>
+    </div>
+  </div>
+
+  <!-- ALIŞTIRMA -->
+  <div class="exercise-box">
+    <div class="ex-header">
+      <span class="ex-badge">Alıştırma</span>
+      <span class="ex-title">Şimdi sıra sende</span>
+    </div>
+    <ol>
+      <li>Fenerbahçe bu sezon <strong>12 penaltıdan 11'ini</strong> gol yaptı. Süper Lig ortalamasının %80 olduğunu kabul ederek tek taraflı hipotez testi yapınız (H₁: p > 0.80). P-değerini hesaplayın.</li>
+      <li>Aynı oran (%90) için n=50 ile n=10 arasındaki p-değeri farkını yorumlayın.</li>
+      <li><em>(Zorlayıcı)</em> Gerçek oran %85 ise bunu %80'den ayırt etmek için kaç penaltı gerekir? (α=0.05, güç=0.80)</li>
+    </ol>
+    <div class="hint">P(X=k) = C(n,k) · pᵏ · (1-p)ⁿ⁻ᵏ &nbsp;|&nbsp; C(12,11)=12, C(12,12)=1</div>
+  </div>
+
+  <!-- KİLİT SİSTEMİ -->
+  <div class="unlock-section" id="unlockSection">
+    <div class="unlock-header">
+      <div class="lock-icon" id="lockIcon">🔒</div>
+      <div class="unlock-header-text">
+        <h3>Bölüm II'nin Kilidi</h3>
+        <p>Soruyu çöz, cevabı gir, bir sonraki bölüm açılsın</p>
+      </div>
+    </div>
+    <div class="unlock-body">
+      <div class="unlock-question">
+        Fenerbahçe sorusundan devam edelim: <strong>n=12, X=11, p₀=0.80</strong> için P(X ≥ 11) hesaplayın.<br><br>
+        P(X=11) + P(X=12) = ?<br><br>
+        Sonucu <strong>yüzde olarak</strong> hesaplayın ve <strong>tam sayıya yuvarlayın</strong>.<br>
+        <em style="font-size:14px;color:var(--muted);">(Örnek: sonuç %7.3 ise → 7 girin)</em>
+      </div>
+
+      <div class="unlock-input-row">
+        <span class="unlock-label">P-değeri ≈ %</span>
+        <input
+          type="number"
+          class="unlock-input"
+          id="unlockInput"
+          placeholder="?"
+          min="0" max="100"
+        >
+        <button class="unlock-btn" onclick="checkAnswer()">Kontrol Et →</button>
+      </div>
+
+      <div class="unlock-feedback" id="unlockFeedback"></div>
+
+      <div class="next-chapter-unlocked" id="nextChapter">
+        <div class="next-unlocked-label">🎉 Doğru! Bölüm II kilidi açıldı</div>
+        <div class="next-unlocked-title">"Ev Fiyatı Kehanet mi, Regresyon mu?"<br>
+          <span style="font-size:15px;font-style:normal;opacity:0.8">Ankara'da bir emlakçı Defne'nin kapısını çalar…</span>
+        </div>
+        <a href="bolum2.html" class="next-btn">Bölüm II'ye Geç →</a>
+      </div>
+
+      <div class="completed-badge" id="completedBadge">
+        ✓ Bu bölümü daha önce tamamladınız — Bölüm II zaten açık!
+        <br><a href="bolum2.html" style="color:var(--green);font-weight:600;">Bölüm II'ye Git →</a>
+      </div>
+    </div>
   </div>
 
 </div>
+
+<script>
+  // Daha önce tamamlandıysa göster
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('bolum1_completed') === 'true') {
+      document.getElementById('completedBadge').classList.add('visible');
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+    }
+  });
+
+  function checkAnswer() {
+    const input = document.getElementById('unlockInput');
+    const feedback = document.getElementById('unlockFeedback');
+    const val = parseInt(input.value.trim());
+
+    // Doğru cevap: P(X≥11 | n=12, p=0.80)
+    // P(X=11) = C(12,11)*(0.8)^11*(0.2)^1 = 12*0.08590*0.2 = 0.2062
+    // P(X=12) = C(12,12)*(0.8)^12 = 0.06872
+    // Toplam ≈ 0.2749 → %27 (yuvarlama: 27 veya 28 kabul)
+    const correct = [27, 28];
+
+    input.classList.remove('error', 'success');
+
+    if (isNaN(val)) {
+      feedback.textContent = 'Lütfen bir sayı girin.';
+      feedback.className = 'unlock-feedback wrong';
+      return;
+    }
+
+    if (correct.includes(val)) {
+      input.classList.add('success');
+      feedback.textContent = 'Doğru! P ≈ %27.5 — H₀ reddedilemez, Fenerbahçe de "istatistiksel olarak sıradan" 😄';
+      feedback.className = 'unlock-feedback correct';
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+      localStorage.setItem('bolum1_completed', 'true');
+      // Ana sayfayı da güncelle
+      localStorage.setItem('progress', JSON.stringify({bolum1: true}));
+    } else {
+      input.classList.add('error');
+      const hints = [
+        'Yanlış. P(X=11) için C(12,11)·(0.8)¹¹·(0.2)¹ formülünü kullan.',
+        'Tekrar dene. (0.8)¹¹ ≈ 0.0859 ve C(12,11) = 12.',
+        'Yaklaşıyorsun. P(X=11) ≈ 0.206 ve P(X=12) ≈ 0.069 — topla ve yüzdeye çevir.'
+      ];
+      const attempt = parseInt(localStorage.getItem('b1_attempts') || '0');
+      feedback.textContent = hints[Math.min(attempt, hints.length-1)];
+      feedback.className = 'unlock-feedback wrong';
+      localStorage.setItem('b1_attempts', attempt + 1);
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  // Enter tuşu desteği
+  document.getElementById('unlockInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkAnswer();
+  });
+</script>
 </body>
 </html>
