@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="tr" style="color-scheme: light only;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bölüm IV — Yüzde Kaç Aldı? | İstatistik Hikayeleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --aged: #e8e0cc;
+    --accent: #8b6914;
+    --accent2: #5a4010;
+    --gold: #b8860b;
+    --gold-lt: #d4a820;
+    --muted: #7a6f5a;
+    --math-bg: #fdf8ee;
+    --math-border: #8b6914;
+    --highlight: #fff3cd;
+    --green: #1a6b3a;
+    --red: #b5292a;
+    color-scheme: light only;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--aged) !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px; line-height: 1.85; min-height: 100vh;
+  }
+
+  /* KİLİT EKRANI */
+  #lockScreen {
+    display:none; position:fixed; inset:0;
+    background:#0f0d09; z-index:9999;
+    flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:40px;
+  }
+  #lockScreen.active { display:flex; }
+  .lock-screen-icon { font-size:64px; margin-bottom:24px; }
+  .lock-screen-title {
+    font-family:'Playfair Display',serif;
+    font-size:28px; color:#f2ead8; margin-bottom:12px;
+  }
+  .lock-screen-desc {
+    font-size:16px; color:rgba(242,234,216,0.5);
+    max-width:400px; line-height:1.7; margin-bottom:32px;
+  }
+  .lock-screen-btn {
+    display:inline-block; background:#c8960c; color:#0f0d09;
+    font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+    padding:14px 36px; border-radius:8px; text-decoration:none; transition:opacity 0.2s;
+  }
+  .lock-screen-btn:hover { opacity:0.85; }
+
+  /* NAV */
+  nav {
+    background:var(--ink);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 40px; height:52px;
+    border-bottom:2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family:'Playfair Display',serif; font-size:14px; font-weight:700;
+    color:var(--paper); text-decoration:none; letter-spacing:0.04em;
+  }
+  .nav-brand span { color:var(--gold); }
+  .nav-back {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.12em; text-transform:uppercase;
+    color:rgba(245,240,232,0.55); text-decoration:none; transition:color 0.2s;
+  }
+  .nav-back:hover { color:var(--gold); }
+
+  .progress-bar { height:4px; background:rgba(184,134,11,0.15); }
+  .progress-fill { height:100%; background:var(--gold); width:66.6%; transition:width 0.6s ease; }
+
+  .page { max-width:720px; margin:0 auto; padding:56px 40px 100px; }
+
+  .prev-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(26,107,58,0.1); border:1px solid rgba(26,107,58,0.25);
+    border-radius:20px; padding:6px 14px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.08em; color:var(--green); margin-bottom:32px;
+    text-decoration:none;
+  }
+  .prev-badge:hover { background:rgba(26,107,58,0.18); }
+
+  .chapter-eyebrow {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.25em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .chapter-eyebrow::before {
+    content:''; width:24px; height:1px; background:var(--gold); display:inline-block;
+  }
+  .chapter-title {
+    font-family:'Playfair Display',serif; font-size:42px; font-weight:700;
+    line-height:1.15; margin-bottom:8px;
+    opacity:0; animation:fadeUp 0.8s 0.1s ease forwards;
+  }
+  .chapter-subtitle {
+    font-size:16px; font-style:italic; color:var(--muted); margin-bottom:48px;
+    opacity:0; animation:fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  .character-card {
+    background:white; border-left:4px solid var(--accent);
+    padding:20px 24px; margin:40px 0;
+    border-radius:0 8px 8px 0; box-shadow:3px 3px 0 var(--aged);
+  }
+  .character-card .label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px;
+  }
+  .character-name {
+    font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:4px;
+  }
+  .character-desc { font-size:14px; color:var(--muted); line-height:1.6; }
+
+  p { margin-bottom:1.4em; }
+  .divider { display:flex; align-items:center; gap:16px; margin:28px 0; }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider-symbol { color:var(--gold); font-size:16px; }
+
+  .dialogue { margin:20px 0; padding:0 0 0 20px; border-left:3px solid var(--aged); }
+  .speaker {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:3px;
+  }
+  .speech { font-style:italic; color:#2a2015; }
+
+  /* GAZETE MANŞET KUTUSU */
+  .newspaper-box {
+    background:white; border:2px solid var(--ink);
+    border-radius:4px; padding:24px 28px; margin:32px 0;
+    position:relative;
+    box-shadow:4px 4px 0 rgba(26,18,8,0.15);
+  }
+  .newspaper-name {
+    font-family:'Playfair Display',serif; font-size:11px; font-weight:700;
+    letter-spacing:0.3em; text-transform:uppercase;
+    color:var(--muted); text-align:center; margin-bottom:8px;
+    padding-bottom:8px; border-bottom:2px solid var(--ink);
+  }
+  .newspaper-headline {
+    font-family:'Playfair Display',serif; font-size:26px; font-weight:700;
+    line-height:1.2; text-align:center; margin:16px 0 10px;
+    color:var(--ink);
+  }
+  .newspaper-sub {
+    font-size:14px; text-align:center; color:var(--muted);
+    font-style:italic;
+  }
+  .newspaper-box .wrong-stamp {
+    position:absolute; top:16px; right:16px;
+    background:var(--red); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:4px 10px; border-radius:4px;
+    transform:rotate(3deg);
+  }
+
+  .stat-box {
+    background:var(--math-bg); border:1px solid var(--math-border);
+    border-radius:8px; padding:24px 28px; margin:32px 0;
+    position:relative; overflow:hidden;
+  }
+  .stat-box::before {
+    content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+    background:var(--math-border);
+  }
+  .stat-box .box-title {
+    font-family:'Playfair Display',serif; font-size:13px; font-weight:700;
+    letter-spacing:0.05em; color:var(--math-border); text-transform:uppercase;
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .stat-box .box-title::after {
+    content:''; flex:1; height:1px; background:var(--math-border); opacity:0.3;
+  }
+  .formula {
+    font-family:'JetBrains Mono',monospace; font-size:14px;
+    background:white; padding:12px 16px; border-radius:4px;
+    margin:10px 0; border:1px solid rgba(139,105,20,0.2);
+    overflow-x:auto; line-height:1.7; color:var(--ink);
+  }
+  .formula .comment { color:var(--muted); font-size:12px; }
+  .formula strong { color:var(--accent2); }
+
+  /* GÜVEN ARALIĞI GÖRSELİ */
+  .ci-visual {
+    background:white; border-radius:8px; padding:24px;
+    margin:16px 0; border:1px solid rgba(139,105,20,0.2);
+  }
+  .ci-label-row {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:12px; font-family:'JetBrains Mono',monospace;
+    font-size:12px; color:var(--muted);
+  }
+  .ci-track {
+    height:12px; background:#f0e8d0; border-radius:6px;
+    position:relative; margin-bottom:8px; overflow:visible;
+  }
+  .ci-fill {
+    position:absolute; height:100%; border-radius:6px;
+    background:rgba(139,105,20,0.25); border:1px solid var(--math-border);
+  }
+  .ci-point {
+    position:absolute; top:50%; transform:translate(-50%,-50%);
+    width:12px; height:12px; background:var(--math-border);
+    border-radius:50%; border:2px solid white;
+    box-shadow:0 0 0 1px var(--math-border);
+  }
+  .ci-line-50 {
+    position:absolute; top:-6px; bottom:-6px;
+    width:1px; background:rgba(181,41,42,0.4);
+    transform:translateX(-50%);
+  }
+  .ci-line-50::after {
+    content:'%50'; position:absolute; top:-18px; left:4px;
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:rgba(181,41,42,0.6);
+  }
+  .ci-note {
+    font-size:13px; color:var(--muted); font-style:italic; margin-top:8px;
+  }
+
+  .data-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  .data-table th {
+    background:var(--accent2); color:white; padding:9px 12px; text-align:left;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em;
+  }
+  .data-table td {
+    padding:8px 12px; border-bottom:1px solid rgba(139,105,20,0.12);
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink);
+  }
+  .data-table tr:nth-child(even) td { background:rgba(139,105,20,0.04); }
+  .data-table .hl td { background:var(--highlight); font-weight:600; }
+
+  .thinking-box {
+    background:white; border:1px dashed var(--gold);
+    border-radius:8px; padding:18px 22px; margin:24px 0; position:relative;
+  }
+  .thinking-box::before {
+    content:'💭'; position:absolute; top:-13px; left:18px;
+    font-size:20px; background:var(--aged); padding:0 6px;
+  }
+  .thinking-box .thinking-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;
+  }
+  .thinking-box p { margin-bottom:0.5em; font-size:16px; color:#2a2015; }
+
+  .conclusion-box {
+    background:linear-gradient(135deg, #2c3e50, #1a252f);
+    color:#f0ece0; padding:28px 32px; border-radius:12px; margin:36px 0;
+    border:1px solid rgba(184,134,11,0.4);
+  }
+  .conclusion-box .conclusion-label {
+    font-family:'Playfair Display',serif; font-size:11px;
+    letter-spacing:0.3em; text-transform:uppercase; color:#f0c040; margin-bottom:10px;
+  }
+  .conclusion-box .conclusion-text {
+    font-family:'Playfair Display',serif; font-size:19px;
+    font-style:italic; line-height:1.6; color:#f0ece0;
+  }
+
+  .exercise-box {
+    border:2px solid var(--accent); border-radius:12px; padding:24px 28px; margin:40px 0 0;
+  }
+  .exercise-box .ex-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:18px;
+  }
+  .ex-badge {
+    background:var(--accent); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase; padding:4px 10px; border-radius:20px;
+  }
+  .ex-title {
+    font-family:'Playfair Display',serif; font-size:18px; font-weight:700;
+  }
+  .exercise-box ol { padding-left:22px; }
+  .exercise-box ol li { margin-bottom:12px; line-height:1.7; }
+  .hint {
+    background:#fffbeb; border:1px solid #f59e0b; border-radius:6px;
+    padding:12px 16px; margin-top:18px; font-size:14px; color:#92400e;
+  }
+  .hint::before { content:'💡 İpucu: '; font-weight:600; }
+
+  /* KİLİT SİSTEMİ */
+  .unlock-section {
+    margin-top:48px; background:white;
+    border:2px solid var(--ink); border-radius:12px; overflow:hidden;
+  }
+  .unlock-header {
+    background:var(--ink); padding:20px 28px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .lock-icon { font-size:26px; }
+  .unlock-header-text h3 {
+    font-family:'Playfair Display',serif; font-size:20px;
+    color:var(--paper); margin-bottom:2px;
+  }
+  .unlock-header-text p {
+    font-size:13px; color:rgba(245,240,232,0.55); font-style:italic; margin:0;
+  }
+  .unlock-body { padding:28px; }
+  .unlock-question {
+    background:var(--math-bg); border-left:4px solid var(--math-border);
+    padding:16px 20px; border-radius:0 8px 8px 0;
+    margin-bottom:24px; font-size:16px; line-height:1.7; color:var(--ink);
+  }
+  .unlock-question strong { color:var(--math-border); }
+  .unlock-input-row {
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  .unlock-label {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
+  }
+  .unlock-input {
+    font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600;
+    width:130px; text-align:center; padding:10px 12px;
+    border:2px solid #d4c9b0; border-radius:8px;
+    background:white; color:var(--ink); outline:none; transition:border-color 0.2s;
+  }
+  .unlock-input:focus { border-color:var(--math-border); }
+  .unlock-input.error { border-color:var(--red); animation:shake 0.4s ease; }
+  .unlock-input.success { border-color:var(--green); }
+  .unlock-btn {
+    background:var(--math-border); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:12px 24px; border:none; border-radius:8px;
+    cursor:pointer; transition:background 0.2s, transform 0.1s;
+  }
+  .unlock-btn:hover { background:var(--accent2); }
+  .unlock-btn:active { transform:scale(0.97); }
+  .unlock-feedback {
+    margin-top:14px; font-size:15px; min-height:24px;
+    font-style:italic; color:var(--muted);
+  }
+  .unlock-feedback.wrong { color:var(--red); }
+  .unlock-feedback.correct { color:var(--green); font-weight:600; }
+
+  .next-chapter-unlocked {
+    display:none; margin-top:28px;
+    background:linear-gradient(135deg, #1a6b3a, #0f4a28);
+    border-radius:10px; padding:24px 28px; text-align:center;
+  }
+  .next-chapter-unlocked.visible { display:block; animation:fadeUp 0.6s ease forwards; }
+  .next-unlocked-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color:rgba(255,255,255,0.6); margin-bottom:8px;
+  }
+  .next-unlocked-title {
+    font-family:'Playfair Display',serif; font-size:20px;
+    font-style:italic; color:white; margin-bottom:20px; line-height:1.4;
+  }
+  .next-btn {
+    display:inline-block; background:white; color:#1a6b3a;
+    font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+    padding:14px 36px; border-radius:8px; text-decoration:none;
+    transition:transform 0.2s, box-shadow 0.2s;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  }
+  .next-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.25); }
+
+  .completed-badge {
+    display:none; background:rgba(26,107,58,0.1);
+    border:1px solid rgba(26,107,58,0.3); border-radius:8px;
+    padding:12px 20px; margin-top:16px; font-size:14px;
+    color:var(--green); font-style:italic; text-align:center;
+  }
+  .completed-badge.visible { display:block; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    25% { transform:translateX(-6px); }
+    75% { transform:translateX(6px); }
+  }
+  @media (max-width:600px) {
+    .page { padding:36px 20px 80px; }
+    .chapter-title { font-size:30px; }
+    nav { padding:0 20px; }
+    .unlock-input-row { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-screen-icon">🔒</div>
+  <div class="lock-screen-title">Bu Bölüm Kilitli</div>
+  <div class="lock-screen-desc">Bölüm IV'ü okumak için önce Bölüm III'ü tamamlaman gerekiyor.</div>
+  <a href="bolum3.html" class="lock-screen-btn">← Bölüm III'e Git</a>
+</div>
+
+<nav>
+  <a class="nav-brand" href="index.html"><span>İ</span>statistik Hikayeleri</a>
+  <a class="nav-back" href="index.html">← Ana Sayfa</a>
+</nav>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="page">
+
+  <a href="bolum3.html" class="prev-badge">✓ Bölüm I, II &amp; III tamamlandı &nbsp;·&nbsp; Bölüm IV →</a>
+
+  <div class="chapter-eyebrow">Bölüm IV</div>
+  <h1 class="chapter-title">Yüzde Kaç Aldı?</h1>
+  <p class="chapter-subtitle">Güven aralıkları, örnekleme hatası ve anket yanılgısı üzerine</p>
+
+  <div class="character-card">
+    <div class="label">Bu bölümün karakterleri</div>
+    <div class="character-name">Defne Arslan</div>
+    <div class="character-desc">Sabah gazetesini okurken çayını neredeyse döküyor.</div>
+    <div style="margin-top:14px">
+      <div class="character-name">Mert Kaya</div>
+      <div class="character-desc">Bu sefer siyasetle ilgisi olmadığı için nispeten tarafsız. Ama yine de anlamıyor.</div>
+    </div>
+  </div>
+
+  <p>Sabah sekizdi. Defne Hoca ofisine girer girmez masasındaki gazeteye gözü takıldı. Manşeti okuyunca kaşları çatıldı.</p>
+
+  <div class="newspaper-box">
+    <div class="newspaper-name">Ankara Postası · Sabah Baskısı</div>
+    <div class="newspaper-headline">"Aday A'nın Oyları Arttı: %46'dan %49'a Çıktı"</div>
+    <div class="newspaper-sub">Seçim öncesi son ankette çarpıcı değişim — uzmanlar yorumluyor</div>
+    <div class="wrong-stamp">YANLIŞ !</div>
+  </div>
+
+  <p>Mert tam o sırada içeri girdi. Defne gazeteyi göstererek sordu:</p>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Bu manşeti okudun mu? 'Oyları arttı' diyor."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Evet, sabah gördüm. Anket yüzde 49 demiş, önceki 46'ymış. Üç puan artış değil mi?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Anketin kaç kişiyle yapıldığını biliyor musun?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Yazmıyor ki... Ah, bekle. Bu önemli mi?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Çok önemli. Küçük yazıya bak."</div>
+  </div>
+
+  <p>Mert gazeteyi aldı, sayfayı çevirdi. En altta küçük bir not vardı: <em>"n=600, örnekleme hatası ±%4"</em></p>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="thinking-box">
+    <div class="thinking-label">Defne düşünüyor</div>
+    <p>Örnekleme hatası ±%4. Bu ne demek?</p>
+    <p>Gerçek değer, ölçülen değerin 4 puan yukarısında veya aşağısında olabilir.</p>
+    <p>Birinci anket %46 ± 4 → gerçek değer <strong>[%42, %50]</strong> aralığında.</p>
+    <p>İkinci anket %49 ± 4 → gerçek değer <strong>[%45, %53]</strong> aralığında.</p>
+    <p>Bu iki aralık birbirini kapsıyor. Fark istatistiksel olarak anlamlı değil.</p>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">📊 Güven Aralığı Hesabı</div>
+    <p style="margin-bottom:12px;font-size:15px;">n=600 için oran güven aralığı (z=1.96, %95 güven):</p>
+    <div class="formula">
+GA = p̂ ± z · √(p̂(1-p̂)/n)
+
+<span class="comment">— 1. anket (p̂ = 0.46):</span>
+GA₁ = 0.46 ± 1.96 · √(0.46 × 0.54 / 600)
+    = 0.46 ± 1.96 · 0.0204
+    = 0.46 ± 0.040
+    = <strong>[%42.0 , %50.0]</strong>
+
+<span class="comment">— 2. anket (p̂ = 0.49):</span>
+GA₂ = 0.49 ± 1.96 · √(0.49 × 0.51 / 600)
+    = 0.49 ± 1.96 · 0.0204
+    = 0.49 ± 0.040
+    = <strong>[%45.0 , %53.0]</strong>
+    </div>
+  </div>
+
+  <!-- Görsel güven aralığı karşılaştırması -->
+  <div class="stat-box">
+    <div class="box-title">📐 Güven Aralıkları — Görsel Karşılaştırma</div>
+    <p style="margin-bottom:16px;font-size:15px;">İki anketin aralıkları büyük ölçüde örtüşüyor:</p>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">1. Anket — p̂ = %46</div>
+      <div class="ci-visual" style="padding:16px 24px;">
+        <div class="ci-label-row"><span>%38</span><span>%46</span><span>%54</span></div>
+        <div class="ci-track">
+          <div class="ci-fill" style="left:25%;width:50%;"></div>
+          <div class="ci-point" style="left:50%;"></div>
+          <div class="ci-line-50" style="left:62.5%;"></div>
+        </div>
+        <div class="ci-note">Aralık: %42 — %50 &nbsp;|&nbsp; Orta nokta: %46</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--math-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">2. Anket — p̂ = %49</div>
+      <div class="ci-visual" style="padding:16px 24px;">
+        <div class="ci-label-row"><span>%38</span><span>%49</span><span>%54</span></div>
+        <div class="ci-track">
+          <div class="ci-fill" style="left:43.75%;width:50%;background:rgba(184,134,11,0.25);border-color:var(--gold);"></div>
+          <div class="ci-point" style="left:68.75%;background:var(--gold);box-shadow:0 0 0 1px var(--gold);"></div>
+          <div class="ci-line-50" style="left:62.5%;"></div>
+        </div>
+        <div class="ci-note">Aralık: %45 — %53 &nbsp;|&nbsp; Orta nokta: %49</div>
+      </div>
+    </div>
+    <p style="margin-top:16px;font-size:14px;color:var(--muted);">↑ İki aralık %45–%50 bölgesinde örtüşüyor. Fark istatistiksel olarak anlamlı değil.</p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Görüyor musun? İki güven aralığı büyük ölçüde örtüşüyor. Gazetenin 'arttı' demesi için bu örtüşmenin olmaması gerekirdi."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Yani gerçek fark sıfır da olabilir?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Kesinlikle. Aynı seçmen kitlesini iki kez örnek alsak farklı sonuçlar çıkardı. Bu fark örneklemenin doğal gürültüsünden kaynaklanıyor olabilir."</div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="stat-box">
+    <div class="box-title">📈 Örneklem Büyüklüğü ve Hata Payı</div>
+    <p style="margin-bottom:14px;font-size:15px;">Aynı %95 güven düzeyi, farklı n için hata payı:</p>
+    <table class="data-table">
+      <thead>
+        <tr><th>n (kişi)</th><th>Hata payı (±)</th><th>3 puanlık fark için karar</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>200</td><td>%6.9</td><td style="color:var(--red)">Anlamlı değil ✗</td></tr>
+        <tr><td>600</td><td>%4.0</td><td style="color:var(--red)">Anlamlı değil ✗</td></tr>
+        <tr><td>1000</td><td>%3.1</td><td style="color:var(--red)">Sınırda — belirsiz</td></tr>
+        <tr class="hl"><td>2500</td><td>%2.0</td><td style="color:var(--green);font-weight:600">Anlamlı ✓</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px;font-size:14px;color:var(--muted);">3 puanlık farkı güvenilir biçimde tespit etmek için en az ~2500 kişi gerekir.</p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Peki gazete neden böyle bir haber yapıyor?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"İki neden olabilir: ya güven aralığını hesaplamadılar, ya da okuyucunun umursamayacağını düşündüler. Her iki durumda da istatistiksel yanlılık var."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Mert</div>
+    <div class="speech">"Doğru haber nasıl olurdu?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Şöyle: 'Aday A, birinci ankette %46 (%42–%50), ikinci ankette %49 (%45–%53) aldı. Aradaki 3 puanlık fark örnekleme hatasının içinde kalıyor.' İşte bu dürüst habercilik."</div>
+  </div>
+
+  <div class="conclusion-box">
+    <div class="conclusion-label">Bu bölümün dersi</div>
+    <div class="conclusion-text">
+      "Tek bir sayı her zaman yanıltıcıdır. Güven aralığını görmeden 'arttı' ya da 'azaldı' demek, karanlıkta yön tarif etmektir."
+      <div style="margin-top:14px;font-size:13px;font-style:normal;color:#c8bfa8;letter-spacing:0.05em">— Defne Arslan</div>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="ex-header">
+      <span class="ex-badge">Alıştırma</span>
+      <span class="ex-title">Şimdi sıra sende</span>
+    </div>
+    <ol>
+      <li>
+        Bir anket <strong>n=1000</strong> kişiyle yapılmış ve adayın oyu <strong>%43</strong> çıkmış.
+        %95 güven aralığını hesaplayın. (z=1.96)
+      </li>
+      <li>
+        Aynı ankette bir hafta sonra oy <strong>%46</strong> çıkmış (n=1000).
+        Bu artış istatistiksel olarak anlamlı mı? Güven aralıklarını karşılaştırın.
+      </li>
+      <li>
+        <em>(Zorlayıcı)</em> Hata payını ±%2'ye indirmek için kaç kişilik örnekleme ihtiyaç var?
+        (p̂=0.5 için en kötü durum)
+      </li>
+    </ol>
+    <div class="hint">GA = p̂ ± 1.96 · √(p̂(1-p̂)/n) &nbsp;|&nbsp; n=1000, p̂=0.43: √(0.43×0.57/1000) ≈ 0.01564</div>
+  </div>
+
+  <!-- KİLİT SİSTEMİ -->
+  <div class="unlock-section">
+    <div class="unlock-header">
+      <div class="lock-icon" id="lockIcon">🔒</div>
+      <div class="unlock-header-text">
+        <h3>Bölüm V'in Kilidi</h3>
+        <p>Soruyu çöz, cevabı gir, bir sonraki bölüm açılsın</p>
+      </div>
+    </div>
+    <div class="unlock-body">
+      <div class="unlock-question">
+        1. alıştırmadan devam: <strong>n=1000, p̂=0.43</strong> için %95 güven aralığının
+        <strong>alt sınırını</strong> hesaplayın.<br><br>
+        GA = 0.43 − 1.96 × √(0.43 × 0.57 / 1000) = ?<br><br>
+        Sonucu <strong>yüzde olarak, virgülden sonra bir basamak</strong> girin.<br>
+        <em style="font-size:14px;color:var(--muted);">(Örnek: alt sınır %39.9 ise → 39.9 girin)</em>
+      </div>
+      <div class="unlock-input-row">
+        <span class="unlock-label">Alt sınır = %</span>
+        <input type="text" class="unlock-input" id="unlockInput" placeholder="0.0">
+        <button class="unlock-btn" onclick="checkAnswer()">Kontrol Et →</button>
+      </div>
+      <div class="unlock-feedback" id="unlockFeedback"></div>
+
+      <div class="next-chapter-unlocked" id="nextChapter">
+        <div class="next-unlocked-label">🎉 Doğru! Bölüm V kilidi açıldı</div>
+        <div class="next-unlocked-title">"Üç Fabrika, Bir Hata"<br>
+          <span style="font-size:15px;font-style:normal;opacity:0.8">Yönetim "fark yok" diyor, Defne F-testini açıyor…</span>
+        </div>
+        <a href="bolum5.html" class="next-btn">Bölüm V'e Geç →</a>
+      </div>
+
+      <div class="completed-badge" id="completedBadge">
+        ✓ Bu bölümü daha önce tamamladınız — Bölüm V zaten açık!
+        <br><a href="bolum5.html" style="color:var(--green);font-weight:600;">Bölüm V'e Git →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('bolum3_completed') !== 'true') {
+      document.getElementById('lockScreen').classList.add('active');
+    }
+    if (localStorage.getItem('bolum4_completed') === 'true') {
+      document.getElementById('completedBadge').classList.add('visible');
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+    }
+  });
+
+  function checkAnswer() {
+    const input    = document.getElementById('unlockInput');
+    const feedback = document.getElementById('unlockFeedback');
+    const raw      = input.value.trim().replace(',', '.');
+    const val      = parseFloat(raw);
+
+    // GA = 0.43 - 1.96 * sqrt(0.43*0.57/1000)
+    // sqrt(0.2451/1000) = sqrt(0.0002451) = 0.015656
+    // 1.96 * 0.015656 = 0.030686
+    // 0.43 - 0.030686 = 0.39931 → %39.9
+    const correct = [39.9, 40.0]; // yuvarlama toleransı
+
+    input.classList.remove('error', 'success');
+
+    if (isNaN(val)) {
+      feedback.textContent = 'Lütfen sayısal bir değer girin (örnek: 39.9)';
+      feedback.className = 'unlock-feedback wrong';
+      return;
+    }
+
+    if (correct.includes(parseFloat(val.toFixed(1)))) {
+      input.classList.add('success');
+      feedback.textContent = 'Doğru! %39.9 — üst sınır %46.1 olur, yani GA = [%39.9, %46.1].';
+      feedback.className = 'unlock-feedback correct';
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+      localStorage.setItem('bolum4_completed', 'true');
+      const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+      progress.bolum4 = true;
+      localStorage.setItem('progress', JSON.stringify(progress));
+    } else {
+      input.classList.add('error');
+      const attempt = parseInt(localStorage.getItem('b4_attempts') || '0');
+      const hints = [
+        'Yanlış. Önce √(0.43×0.57÷1000) hesapla.',
+        'Tekrar dene. 0.43×0.57 = 0.2451, bunu 1000\'e böl, karekök al: ≈0.01566.',
+        'Neredeyse: 1.96 × 0.01566 ≈ 0.0307. Bunu 0.43\'ten çıkar ve yüzdeye çevir.'
+      ];
+      feedback.textContent = hints[Math.min(attempt, hints.length - 1)];
+      feedback.className = 'unlock-feedback wrong';
+      localStorage.setItem('b4_attempts', attempt + 1);
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  document.getElementById('unlockInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkAnswer();
+  });
+</script>
+</body>
+</html>

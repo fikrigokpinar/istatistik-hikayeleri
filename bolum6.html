@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="tr" style="color-scheme: light only;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bölüm VI — Suçlu Kim? | İstatistik Hikayeleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a0a0a;
+    --paper: #f8f0ee;
+    --aged: #ecddd8;
+    --accent: #8b1a1a;
+    --accent2: #5a0f0f;
+    --gold: #b8860b;
+    --muted: #7a5a58;
+    --math-bg: #fdf0ef;
+    --math-border: #8b1a1a;
+    --highlight: #fde8e8;
+    --green: #1a6b3a;
+    --red: #b5292a;
+    color-scheme: light only;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--aged) !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px; line-height: 1.85; min-height: 100vh;
+  }
+
+  /* KİLİT EKRANI */
+  #lockScreen {
+    display:none; position:fixed; inset:0;
+    background:#1a0a0a; z-index:9999;
+    flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:40px;
+  }
+  #lockScreen.active { display:flex; }
+  .lock-screen-icon { font-size:64px; margin-bottom:24px; }
+  .lock-screen-title {
+    font-family:'Playfair Display',serif;
+    font-size:28px; color:#f8f0ee; margin-bottom:12px;
+  }
+  .lock-screen-desc {
+    font-size:16px; color:rgba(248,240,238,0.5);
+    max-width:400px; line-height:1.7; margin-bottom:32px;
+  }
+  .lock-screen-btn {
+    display:inline-block; background:#b8860b; color:#1a0a0a;
+    font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+    padding:14px 36px; border-radius:8px; text-decoration:none;
+  }
+
+  /* BİTİRME EKRANI */
+  #completionScreen {
+    display:none; position:fixed; inset:0;
+    background:linear-gradient(135deg, #0f1a12, #1a2e1a);
+    z-index:9998; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:40px; overflow-y:auto;
+  }
+  #completionScreen.active { display:flex; }
+  .completion-stars { font-size:48px; margin-bottom:24px; letter-spacing:8px; }
+  .completion-title {
+    font-family:'Playfair Display',serif; font-size:clamp(28px,5vw,48px);
+    font-weight:900; color:#f2ead8; margin-bottom:8px; line-height:1.1;
+  }
+  .completion-title em { color:#f0c040; font-style:italic; display:block; }
+  .completion-subtitle {
+    font-family:'Playfair Display',serif; font-size:18px;
+    font-style:italic; color:rgba(242,234,216,0.6); margin-bottom:40px;
+  }
+  .completion-stats {
+    display:flex; gap:40px; margin-bottom:48px; flex-wrap:wrap; justify-content:center;
+  }
+  .comp-stat-num {
+    font-family:'Playfair Display',serif; font-size:40px; font-weight:700;
+    color:#f0c040; line-height:1; margin-bottom:6px;
+  }
+  .comp-stat-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.12em; text-transform:uppercase;
+    color:rgba(242,234,216,0.45);
+  }
+  .completion-msg {
+    max-width:520px; font-size:17px; line-height:1.8;
+    color:rgba(242,234,216,0.75); margin-bottom:40px;
+  }
+  .completion-badges {
+    display:flex; gap:12px; flex-wrap:wrap;
+    justify-content:center; margin-bottom:48px;
+  }
+  .comp-badge {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(240,192,64,0.3);
+    border-radius:8px; padding:12px 20px; text-align:center;
+  }
+  .comp-badge-icon { font-size:28px; margin-bottom:6px; }
+  .comp-badge-name {
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    letter-spacing:0.1em; text-transform:uppercase; color:#f0c040;
+    display:block; margin-bottom:2px;
+  }
+  .comp-badge-desc {
+    font-size:12px; color:rgba(242,234,216,0.5);
+  }
+  .completion-btn {
+    display:inline-flex; align-items:center; gap:10px;
+    background:#f0c040; color:#0f1a12;
+    font-family:'Playfair Display',serif; font-size:17px; font-weight:700;
+    padding:16px 40px; border-radius:8px; text-decoration:none;
+    transition:background 0.2s, transform 0.2s;
+    box-shadow:0 4px 20px rgba(240,192,64,0.3);
+  }
+  .completion-btn:hover { background:#f8d060; transform:translateY(-2px); }
+
+  /* NAV */
+  nav {
+    background:var(--ink);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 40px; height:52px; border-bottom:2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family:'Playfair Display',serif; font-size:14px; font-weight:700;
+    color:var(--paper); text-decoration:none; letter-spacing:0.04em;
+  }
+  .nav-brand span { color:var(--gold); }
+  .nav-back {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.12em; text-transform:uppercase;
+    color:rgba(248,240,238,0.5); text-decoration:none; transition:color 0.2s;
+  }
+  .nav-back:hover { color:var(--gold); }
+
+  /* Son bölüm — progress tam dolu */
+  .progress-bar { height:4px; background:rgba(184,134,11,0.15); }
+  .progress-fill { height:100%; background:var(--gold); width:100%; transition:width 0.6s ease; }
+
+  .page { max-width:720px; margin:0 auto; padding:56px 40px 100px; }
+
+  .prev-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(26,107,58,0.1); border:1px solid rgba(26,107,58,0.25);
+    border-radius:20px; padding:6px 14px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.08em; color:var(--green); margin-bottom:32px;
+    text-decoration:none;
+  }
+
+  /* Son bölüm rozeti */
+  .final-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(184,134,11,0.15); border:1px solid rgba(184,134,11,0.35);
+    border-radius:20px; padding:6px 14px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:16px;
+    animation: pulse-gold 2s infinite;
+  }
+  @keyframes pulse-gold {
+    0%,100% { box-shadow:0 0 0 0 rgba(184,134,11,0.3); }
+    50%      { box-shadow:0 0 0 8px rgba(184,134,11,0); }
+  }
+
+  .chapter-eyebrow {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.25em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .chapter-eyebrow::before {
+    content:''; width:24px; height:1px; background:var(--gold); display:inline-block;
+  }
+  .chapter-title {
+    font-family:'Playfair Display',serif; font-size:42px; font-weight:700;
+    line-height:1.15; margin-bottom:8px;
+    opacity:0; animation:fadeUp 0.8s 0.1s ease forwards;
+  }
+  .chapter-subtitle {
+    font-size:16px; font-style:italic; color:var(--muted); margin-bottom:48px;
+    opacity:0; animation:fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  .character-card {
+    background:white; border-left:4px solid var(--accent);
+    padding:20px 24px; margin:40px 0;
+    border-radius:0 8px 8px 0; box-shadow:3px 3px 0 var(--aged);
+  }
+  .character-card .label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px;
+  }
+  .character-name {
+    font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:4px;
+  }
+  .character-desc { font-size:14px; color:var(--muted); line-height:1.6; }
+
+  p { margin-bottom:1.4em; }
+  .divider { display:flex; align-items:center; gap:16px; margin:28px 0; }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider-symbol { color:var(--gold); font-size:16px; }
+
+  .dialogue { margin:20px 0; padding:0 0 0 20px; border-left:3px solid var(--aged); }
+  .speaker {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:3px;
+  }
+  .speech { font-style:italic; color:#2a1010; }
+
+  /* MAHKEME EVRAK KUTUSU */
+  .court-box {
+    background:white; border:2px solid var(--ink);
+    border-radius:4px; padding:24px 28px; margin:32px 0;
+    position:relative; box-shadow:4px 4px 0 rgba(26,10,10,0.12);
+  }
+  .court-stamp {
+    position:absolute; top:-12px; left:20px;
+    background:var(--accent); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    letter-spacing:0.15em; text-transform:uppercase;
+    padding:3px 12px; border-radius:20px;
+  }
+  .court-title {
+    font-family:'Playfair Display',serif; font-size:14px; font-weight:700;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--muted); text-align:center; margin-bottom:12px;
+    padding-bottom:12px; border-bottom:1px solid #e0d0d0;
+  }
+  .court-claim {
+    font-family:'Playfair Display',serif; font-size:19px;
+    font-style:italic; text-align:center; line-height:1.5;
+    color:var(--ink); margin:12px 0;
+  }
+  .court-evidence {
+    font-size:14px; color:var(--muted); text-align:center; margin-top:10px;
+  }
+
+  .stat-box {
+    background:var(--math-bg); border:1px solid var(--math-border);
+    border-radius:8px; padding:24px 28px; margin:32px 0;
+    position:relative; overflow:hidden;
+  }
+  .stat-box::before {
+    content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+    background:var(--math-border);
+  }
+  .stat-box .box-title {
+    font-family:'Playfair Display',serif; font-size:13px; font-weight:700;
+    letter-spacing:0.05em; color:var(--math-border); text-transform:uppercase;
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .stat-box .box-title::after {
+    content:''; flex:1; height:1px; background:var(--math-border); opacity:0.3;
+  }
+  .formula {
+    font-family:'JetBrains Mono',monospace; font-size:14px;
+    background:white; padding:12px 16px; border-radius:4px;
+    margin:10px 0; border:1px solid rgba(139,26,26,0.15);
+    overflow-x:auto; line-height:1.7; color:var(--ink);
+  }
+  .formula .comment { color:var(--muted); font-size:12px; }
+  .formula strong { color:var(--accent2); }
+
+  /* Saçılım diyagramı — SVG tabanlı */
+  .scatter-wrap {
+    background:white; border-radius:8px;
+    padding:16px; margin:16px 0;
+    border:1px solid rgba(139,26,26,0.15);
+    overflow:hidden;
+  }
+  .scatter-title {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:10px;
+  }
+  .scatter-svg { width:100%; height:auto; display:block; }
+
+  /* Yanıltıcı korelasyonlar */
+  .spurious-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;
+  }
+  .spurious-card {
+    background:white; border-radius:8px; padding:16px 18px;
+    border-left:3px solid var(--accent);
+  }
+  .spurious-r {
+    font-family:'JetBrains Mono',monospace; font-size:22px;
+    font-weight:700; color:var(--accent); margin-bottom:6px;
+  }
+  .spurious-desc {
+    font-size:13px; line-height:1.6; color:var(--muted);
+  }
+  .spurious-conf {
+    font-size:11px; font-style:italic; color:#c0a090; margin-top:6px;
+  }
+
+  .data-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  .data-table th {
+    background:var(--accent2); color:white; padding:9px 12px; text-align:left;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em;
+  }
+  .data-table td {
+    padding:8px 12px; border-bottom:1px solid rgba(139,26,26,0.1);
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink);
+  }
+  .data-table tr:nth-child(even) td { background:rgba(139,26,26,0.03); }
+  .data-table .hl td { background:var(--highlight); font-weight:600; }
+
+  .thinking-box {
+    background:white; border:1px dashed var(--gold);
+    border-radius:8px; padding:18px 22px; margin:24px 0; position:relative;
+  }
+  .thinking-box::before {
+    content:'💭'; position:absolute; top:-13px; left:18px;
+    font-size:20px; background:var(--aged); padding:0 6px;
+  }
+  .thinking-box .thinking-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;
+  }
+  .thinking-box p { margin-bottom:0.5em; font-size:16px; color:#2a1010; }
+
+  /* Nedensellik zinciri */
+  .causal-chain {
+    display:flex; align-items:center; gap:0; margin:16px 0; flex-wrap:wrap;
+  }
+  .causal-node {
+    background:white; border:2px solid var(--math-border);
+    border-radius:8px; padding:10px 16px;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    text-align:center; color:var(--ink); flex-shrink:0;
+  }
+  .causal-node.confounder {
+    background:var(--highlight); border-color:var(--gold);
+    border-style:dashed;
+  }
+  .causal-arrow {
+    font-size:20px; color:var(--muted); padding:0 6px; flex-shrink:0;
+  }
+  .causal-arrow.spurious { color:var(--accent); }
+
+  .conclusion-box {
+    background:linear-gradient(135deg, #2c1010, #1a0808);
+    color:#f8f0ee; padding:28px 32px; border-radius:12px; margin:36px 0;
+    border:1px solid rgba(184,134,11,0.4);
+  }
+  .conclusion-box .conclusion-label {
+    font-family:'Playfair Display',serif; font-size:11px;
+    letter-spacing:0.3em; text-transform:uppercase; color:#f0c040; margin-bottom:10px;
+  }
+  .conclusion-box .conclusion-text {
+    font-family:'Playfair Display',serif; font-size:19px;
+    font-style:italic; line-height:1.6; color:#f8f0ee;
+  }
+
+  .exercise-box {
+    border:2px solid var(--accent); border-radius:12px; padding:24px 28px; margin:40px 0 0;
+  }
+  .exercise-box .ex-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:18px;
+  }
+  .ex-badge {
+    background:var(--accent); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase; padding:4px 10px; border-radius:20px;
+  }
+  .ex-title {
+    font-family:'Playfair Display',serif; font-size:18px; font-weight:700;
+  }
+  .exercise-box ol { padding-left:22px; }
+  .exercise-box ol li { margin-bottom:12px; line-height:1.7; }
+  .hint {
+    background:#fffbeb; border:1px solid #f59e0b; border-radius:6px;
+    padding:12px 16px; margin-top:18px; font-size:14px; color:#92400e;
+  }
+  .hint::before { content:'💡 İpucu: '; font-weight:600; }
+
+  /* SON BÖLÜM — KİLİT YOK, TAMAMLAMA VAR */
+  .final-unlock {
+    margin-top:48px; background:white;
+    border:2px solid var(--ink); border-radius:12px; overflow:hidden;
+  }
+  .final-unlock-header {
+    background:var(--ink); padding:20px 28px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .final-unlock-header h3 {
+    font-family:'Playfair Display',serif; font-size:20px;
+    color:var(--paper); margin-bottom:2px;
+  }
+  .final-unlock-header p {
+    font-size:13px; color:rgba(248,240,238,0.55); font-style:italic; margin:0;
+  }
+  .final-body { padding:28px; }
+  .final-question {
+    background:var(--math-bg); border-left:4px solid var(--math-border);
+    padding:16px 20px; border-radius:0 8px 8px 0;
+    margin-bottom:24px; font-size:16px; line-height:1.7; color:var(--ink);
+  }
+  .final-question strong { color:var(--math-border); }
+  .final-input-row {
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  .final-label {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
+  }
+  .final-input {
+    font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600;
+    width:130px; text-align:center; padding:10px 12px;
+    border:2px solid #d4c0be; border-radius:8px;
+    background:white; color:var(--ink); outline:none; transition:border-color 0.2s;
+  }
+  .final-input:focus { border-color:var(--math-border); }
+  .final-input.error { border-color:var(--red); animation:shake 0.4s ease; }
+  .final-input.success { border-color:var(--green); }
+  .final-btn {
+    background:var(--accent); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:12px 24px; border:none; border-radius:8px;
+    cursor:pointer; transition:background 0.2s, transform 0.1s;
+  }
+  .final-btn:hover { background:var(--accent2); }
+  .final-btn:active { transform:scale(0.97); }
+  .final-feedback {
+    margin-top:14px; font-size:15px; min-height:24px;
+    font-style:italic; color:var(--muted);
+  }
+  .final-feedback.wrong { color:var(--red); }
+  .final-feedback.correct { color:var(--green); font-weight:600; }
+
+  .already-done {
+    display:none; background:rgba(26,107,58,0.1);
+    border:1px solid rgba(26,107,58,0.3); border-radius:8px;
+    padding:16px 20px; font-size:15px;
+    color:var(--green); text-align:center; cursor:pointer;
+    transition:background 0.2s;
+  }
+  .already-done.visible { display:block; }
+  .already-done:hover { background:rgba(26,107,58,0.18); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    25% { transform:translateX(-6px); }
+    75% { transform:translateX(6px); }
+  }
+  @keyframes popIn {
+    0%   { opacity:0; transform:scale(0.85); }
+    70%  { transform:scale(1.03); }
+    100% { opacity:1; transform:scale(1); }
+  }
+
+  @media (max-width:600px) {
+    .page { padding:36px 20px 80px; }
+    .chapter-title { font-size:30px; }
+    nav { padding:0 20px; }
+    .spurious-grid { grid-template-columns:1fr; }
+    .causal-chain { flex-direction:column; align-items:flex-start; }
+    .final-input-row { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- KİLİT EKRANI -->
+<div id="lockScreen">
+  <div class="lock-screen-icon">🔒</div>
+  <div class="lock-screen-title">Bu Bölüm Kilitli</div>
+  <div class="lock-screen-desc">Son bölümü okumak için önce Bölüm V'i tamamlaman gerekiyor.</div>
+  <a href="bolum5.html" class="lock-screen-btn">← Bölüm V'e Git</a>
+</div>
+
+<!-- TAMAMLAMA EKRANI -->
+<div id="completionScreen">
+  <div class="completion-stars">⭐⭐⭐⭐⭐⭐</div>
+  <h1 class="completion-title">
+    Tebrikler!
+    <em>Tüm Vakalar Çözüldü</em>
+  </h1>
+  <p class="completion-subtitle">Defne Arslan Serisi — 6 / 6 Bölüm Tamamlandı</p>
+
+  <div class="completion-stats">
+    <div>
+      <div class="comp-stat-num">6</div>
+      <div class="comp-stat-label">Bölüm</div>
+    </div>
+    <div>
+      <div class="comp-stat-num">6</div>
+      <div class="comp-stat-label">Konu</div>
+    </div>
+    <div>
+      <div class="comp-stat-num">6</div>
+      <div class="comp-stat-label">Kilit Açıldı</div>
+    </div>
+  </div>
+
+  <p class="completion-msg">
+    Hipotez testinden regresyona, t-testinden ANOVA'ya, güven aralıklarından 
+    korelasyona — istatistiğin temel araçlarını gerçek vakalar üzerinden öğrendin.
+    Defne Hoca gurur duyardı.
+  </p>
+
+  <div class="completion-badges">
+    <div class="comp-badge">
+      <div class="comp-badge-icon">⚽</div>
+      <span class="comp-badge-name">Hipotez Testi</span>
+      <div class="comp-badge-desc">Bölüm I</div>
+    </div>
+    <div class="comp-badge">
+      <div class="comp-badge-icon">🏘️</div>
+      <span class="comp-badge-name">Regresyon</span>
+      <div class="comp-badge-desc">Bölüm II</div>
+    </div>
+    <div class="comp-badge">
+      <div class="comp-badge-icon">💊</div>
+      <span class="comp-badge-name">t-Testi</span>
+      <div class="comp-badge-desc">Bölüm III</div>
+    </div>
+    <div class="comp-badge">
+      <div class="comp-badge-icon">📊</div>
+      <span class="comp-badge-name">Güven Aralığı</span>
+      <div class="comp-badge-desc">Bölüm IV</div>
+    </div>
+    <div class="comp-badge">
+      <div class="comp-badge-icon">🏭</div>
+      <span class="comp-badge-name">ANOVA</span>
+      <div class="comp-badge-desc">Bölüm V</div>
+    </div>
+    <div class="comp-badge">
+      <div class="comp-badge-icon">⚖️</div>
+      <span class="comp-badge-name">Korelasyon</span>
+      <div class="comp-badge-desc">Bölüm VI</div>
+    </div>
+  </div>
+
+  <a href="index.html" class="completion-btn">← Ana Sayfaya Dön</a>
+</div>
+
+<nav>
+  <a class="nav-brand" href="index.html"><span>İ</span>statistik Hikayeleri</a>
+  <a class="nav-back" href="index.html">← Ana Sayfa</a>
+</nav>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="page">
+
+  <a href="bolum5.html" class="prev-badge">✓ Bölüm I–V tamamlandı &nbsp;·&nbsp; Son Bölüm →</a>
+  <div class="final-badge">★ Son Bölüm</div>
+
+  <div class="chapter-eyebrow">Bölüm VI</div>
+  <h1 class="chapter-title">Suçlu Kim?</h1>
+  <p class="chapter-subtitle">Korelasyon, nedensellik ve mahkemede istatistik üzerine</p>
+
+  <div class="character-card">
+    <div class="label">Bu bölümün karakterleri</div>
+    <div class="character-name">Defne Arslan</div>
+    <div class="character-desc">Bu sefer normal ofisinde değil — mahkeme salonunda bilirkişi olarak.</div>
+    <div style="margin-top:14px">
+      <div class="character-name">Av. Selin Çelik</div>
+      <div class="character-desc">Genç ve hırslı bir avukat. Müvekkilini korelasyon verileriyle suçlayan iddia makamına karşı Defne'den yardım istiyor.</div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="character-name">Savcı Kaan Doğan</div>
+      <div class="character-desc">"Veriler konuşuyor" diyor. Ama hangi veriler, nasıl konuşuyor?</div>
+    </div>
+  </div>
+
+  <p>Ankara 3. Ticaret Mahkemesi, Salı sabahı. Defne bilirkişi kürsüsünde oturmuş, önündeki dosyaya bakıyordu. İddia şuydu:</p>
+
+  <div class="court-box">
+    <div class="court-stamp">İddia — Mahkeme Dosyası</div>
+    <div class="court-title">Ankara 3. Ticaret Mahkemesi · 2024/1847</div>
+    <div class="court-claim">
+      "Sanık şirketin reklam harcamaları arttıkça rakip şirketin satışları düşmüştür.
+      Bu nedenle sanık, haksız rekabet yoluyla piyasayı manipüle etmiştir."
+    </div>
+    <div class="court-evidence">Kanıt: r = 0.87 korelasyon katsayısı (2019–2023, aylık veri)</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Savcı Doğan</div>
+    <div class="speech">"Sayın bilirkişi, r=0.87 çok güçlü bir korelasyon değil mi? Bu iki değişken arasında açık bir ilişki var."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Güçlü bir korelasyon var, evet. Ama güçlü korelasyon, nedensellik anlamına gelmez."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Savcı Doğan</div>
+    <div class="speech">"Açar mısınız?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Memnuniyetle."</div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="stat-box">
+    <div class="box-title">📊 Veri — Aylık Gözlemler (2019–2023)</div>
+
+    <div class="scatter-wrap">
+      <div class="scatter-title">Reklam Harcaması vs. Rakip Satışları — r = 0.87</div>
+      <svg class="scatter-svg" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Izgara -->
+        <line x1="60" y1="20" x2="60" y2="260" stroke="#e0d0ce" stroke-width="1"/>
+        <line x1="60" y1="260" x2="480" y2="260" stroke="#e0d0ce" stroke-width="1"/>
+        <line x1="60" y1="20" x2="480" y2="20" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+        <line x1="60" y1="100" x2="480" y2="100" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+        <line x1="60" y1="180" x2="480" y2="180" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+        <line x1="165" y1="20" x2="165" y2="260" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+        <line x1="270" y1="20" x2="270" y2="260" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+        <line x1="375" y1="20" x2="375" y2="260" stroke="#f0e0de" stroke-width="0.5" stroke-dasharray="4"/>
+
+        <!-- Eksen etiketleri -->
+        <text x="270" y="290" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5a58">Reklam Harcaması (bin ₺)</text>
+        <text x="20" y="140" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5a58" transform="rotate(-90,20,140)">Rakip Satış</text>
+
+        <!-- Trend çizgisi (negatif — ters korelasyon) -->
+        <line x1="80" y1="60" x2="460" y2="230" stroke="#8b1a1a" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.5"/>
+
+        <!-- Veri noktaları — reklam↑ rakip satış↓ -->
+        <circle cx="90"  cy="55"  r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="110" cy="70"  r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="130" cy="80"  r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="155" cy="95"  r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="175" cy="105" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="195" cy="108" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="220" cy="118" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="240" cy="128" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="260" cy="135" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="285" cy="148" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="305" cy="155" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="325" cy="165" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="350" cy="172" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="370" cy="185" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="395" cy="192" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="415" cy="200" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="440" cy="210" r="5" fill="#8b1a1a" opacity="0.7"/>
+        <circle cx="458" cy="222" r="5" fill="#8b1a1a" opacity="0.7"/>
+
+        <!-- r değeri -->
+        <text x="460" y="45" text-anchor="end" font-family="monospace" font-size="13" fill="#8b1a1a" font-weight="bold">r = −0.87</text>
+        <text x="460" y="60" text-anchor="end" font-family="monospace" font-size="10" fill="#7a5a58">n = 60 ay</text>
+      </svg>
+    </div>
+
+    <p style="margin-top:4px;font-size:14px;color:var(--muted);">Reklam harcaması artarken rakip satışları düşüyor. Güçlü negatif korelasyon — ama neden?</p>
+  </div>
+
+  <div class="thinking-box">
+    <div class="thinking-label">Defne düşünüyor</div>
+    <p>r=−0.87 gerçekten güçlü. Ama korelasyon üç şekilde ortaya çıkabilir:</p>
+    <p><strong>1.</strong> A → B (A, B'ye neden olur)</p>
+    <p><strong>2.</strong> B → A (B, A'ya neden olur)</p>
+    <p><strong>3.</strong> C → A ve C → B (Ortak bir üçüncü değişken her ikisini de etkiliyor)</p>
+    <p>Hangisi? Bunu korelasyon katsayısı söyleyemez.</p>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">🔍 Gizli Değişken — Pazar Büyümesi</div>
+    <p style="margin-bottom:14px;font-size:15px;">Defne dosyaya üçüncü bir değişken ekledi: sektörün genel büyüme hızı.</p>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Gerçek ilişki zinciri:</div>
+      <div class="causal-chain">
+        <div class="causal-node confounder">Pazar Daralması<br><span style="font-size:11px;color:var(--muted)">(karıştırıcı değişken)</span></div>
+        <div class="causal-arrow">→</div>
+        <div class="causal-node">Sanık Reklamı<br><span style="font-size:11px;color:var(--muted)">artırır (savunma)</span></div>
+        <div class="causal-arrow spurious" style="font-size:14px;color:var(--accent)">≠</div>
+        <div class="causal-node">Rakip Satışı<br><span style="font-size:11px;color:var(--muted)">düşer</span></div>
+      </div>
+      <div class="causal-chain" style="margin-top:8px;">
+        <div style="width:180px;flex-shrink:0;"></div>
+        <div class="causal-arrow" style="transform:rotate(45deg);margin-left:20px;">↘</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-style:italic;padding:6px 0;">Pazar daralması rakip satışını da düşürür</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Yıl</th><th>Sektör Büyüme (%)</th><th>Sanık Reklam (bin ₺)</th><th>Rakip Satış (birim)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2019</td><td style="color:var(--green)">+8.2</td><td>120</td><td>8400</td></tr>
+        <tr><td>2020</td><td style="color:var(--red)">−3.1</td><td>145</td><td>7600</td></tr>
+        <tr><td>2021</td><td style="color:var(--red)">−1.4</td><td>160</td><td>7100</td></tr>
+        <tr><td>2022</td><td style="color:var(--red)">−5.8</td><td>190</td><td>6200</td></tr>
+        <tr class="hl"><td>2023</td><td style="color:var(--red)">−7.2</td><td>220</td><td>5400</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px;font-size:14px;color:var(--muted);">Sektör daraldıkça hem sanık reklamı artırıyor (pazar payını korumak için) hem de rakip satışları düşüyor. İki değişken aynı nedenle hareket ediyor — ama biri diğerine neden olmak zorunda değil.</p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Savcı Bey, sektör büyüme hızını kontrol ettiğinizde, reklam harcaması ile rakip satışları arasındaki kısmi korelasyon 0.87'den 0.12'ye düşüyor. İstatistiksel olarak anlamsız."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Savcı Doğan</div>
+    <div class="speech">"Yani korelasyon… gerçek değil mi?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Korelasyon gerçek. Ama nedensellik değil. İkisi birbirini karıştırmak — özellikle mahkemede — çok tehlikeli."</div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="stat-box">
+    <div class="box-title">😄 Gerçek Hayattan Yanıltıcı Korelasyonlar</div>
+    <p style="margin-bottom:14px;font-size:15px;">Korelasyon ≠ nedensellik — klasik örnekler:</p>
+    <div class="spurious-grid">
+      <div class="spurious-card">
+        <div class="spurious-r">r = 0.95</div>
+        <div class="spurious-desc">ABD'de Nicolas Cage filmleri ile havuz boğulmaları arasındaki yıllık korelasyon.</div>
+        <div class="spurious-conf">Ortak neden: yaz sezonu</div>
+      </div>
+      <div class="spurious-card">
+        <div class="spurious-r">r = 0.91</div>
+        <div class="spurious-desc">Türkiye'de internet kullanımı ile obezite oranı artışı arasındaki korelasyon (2000–2020).</div>
+        <div class="spurious-conf">Ortak neden: kentleşme ve gelir artışı</div>
+      </div>
+      <div class="spurious-card">
+        <div class="spurious-r">r = 0.88</div>
+        <div class="spurious-desc">Ülkelerdeki çikolata tüketimi ile Nobel ödülü kazanan kişi sayısı arasındaki korelasyon.</div>
+        <div class="spurious-conf">Ortak neden: refah düzeyi</div>
+      </div>
+      <div class="spurious-card">
+        <div class="spurious-r">r = 0.93</div>
+        <div class="spurious-desc">Bir ilde itfaiye çağrısı sayısı ile yangında ölüm sayısı arasındaki korelasyon.</div>
+        <div class="spurious-conf">Neden: büyük yangınlar her ikisini de artırır</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Av. Çelik</div>
+    <div class="speech">"Bilirkişi Hanım, özetle ne söylüyorsunuz?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"İki şey söylüyorum. Birincisi: korelasyon, nedenselliği kanıtlamaz. İkincisi: bu davada güçlü korelasyonun asıl açıklaması sektörel daralma. Sanığın reklamları rakibin satışlarını düşürmedi — ikisi de aynı fırtınada sallanıyordu."</div>
+  </div>
+
+  <div class="conclusion-box">
+    <div class="conclusion-label">Bu serinin son dersi</div>
+    <div class="conclusion-text">
+      "Korelasyon bir ipucudur, hüküm değil. İki değişkenin birlikte hareket etmesi, birinin diğerine neden olduğunu kanıtlamaz. İstatistik bilgeliği, bu farkı her zaman akılda tutmaktır."
+      <div style="margin-top:14px;font-size:13px;font-style:normal;color:#d4b8b0;letter-spacing:0.05em">— Defne Arslan</div>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="ex-header">
+      <span class="ex-badge">Son Alıştırma</span>
+      <span class="ex-title">Seriyi Tamamla</span>
+    </div>
+    <ol>
+      <li>
+        Kısmi korelasyon nedir? Sektör büyümesi kontrol edildiğinde korelasyonun 0.87'den 0.12'ye düşmesi ne anlama gelir?
+      </li>
+      <li>
+        "İtfaiye çağrısı ile ölüm sayısı" örneğinde karıştırıcı değişken nedir? Bu nedenle itfaiye sayısını azaltmak ölümleri azaltır mı?
+      </li>
+      <li>
+        <em>(Final sorusu)</em> Nedenselliği kanıtlamak için korelasyona ek olarak hangi yöntemler kullanılır? En az ikisini açıklayın.
+      </li>
+    </ol>
+    <div class="hint">Nedensellik için: rastgele atama (RCT), doğal deneyler, farkların farkı (DiD), araç değişkenler...</div>
+  </div>
+
+  <!-- SON BÖLÜM — TAMAMLAMA -->
+  <div class="final-unlock">
+    <div class="final-unlock-header">
+      <div style="font-size:26px;">🏆</div>
+      <div>
+        <h3>Seriyi Tamamla</h3>
+        <p>Son soruyu çöz — 6 bölümün kilidi açılsın</p>
+      </div>
+    </div>
+    <div class="final-body">
+      <div class="final-question">
+        Kısmi korelasyon hesabından: sektör büyümesi kontrol edildiğinde korelasyon
+        <strong>0.87'den 0.12'ye</strong> düştü.<br><br>
+        Bu düşüş orijinal korelasyonun yüzde kaçını ortadan kaldırdı?<br>
+        <strong>(0.87 − 0.12) / 0.87 × 100 = ?</strong><br><br>
+        Sonucu <strong>tam sayıya yuvarlayarak</strong> girin.
+        <br><em style="font-size:14px;color:var(--muted);">(Örnek: %86 ise → 86 girin)</em>
+      </div>
+      <div class="final-input-row">
+        <span class="final-label">Oran = %</span>
+        <input type="text" class="final-input" id="finalInput" placeholder="?">
+        <button class="final-btn" onclick="checkFinal()">Tamamla →</button>
+      </div>
+      <div class="final-feedback" id="finalFeedback"></div>
+
+      <div class="already-done" id="alreadyDone" onclick="showCompletion()">
+        ✓ Bu bölümü daha önce tamamladınız — Tamamlama ekranını tekrar görmek için tıklayın 🏆
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('bolum5_completed') !== 'true') {
+      document.getElementById('lockScreen').classList.add('active');
+    }
+    if (localStorage.getItem('bolum6_completed') === 'true') {
+      document.getElementById('alreadyDone').classList.add('visible');
+    }
+  });
+
+  function checkFinal() {
+    const input    = document.getElementById('finalInput');
+    const feedback = document.getElementById('finalFeedback');
+    const raw      = input.value.trim().replace(',', '.');
+    const val      = parseInt(raw);
+
+    // (0.87 - 0.12) / 0.87 * 100 = 0.75/0.87*100 = 86.2 → 86
+    const correct = [86, 87]; // yuvarlama toleransı
+
+    input.classList.remove('error', 'success');
+
+    if (isNaN(val)) {
+      feedback.textContent = 'Lütfen tam sayı girin.';
+      feedback.className = 'final-feedback wrong';
+      return;
+    }
+
+    if (correct.includes(val)) {
+      input.classList.add('success');
+      feedback.textContent = 'Doğru! Orijinal korelasyonun %86\'sı karıştırıcı değişkenden kaynaklanıyordu.';
+      feedback.className = 'final-feedback correct';
+
+      localStorage.setItem('bolum6_completed', 'true');
+      const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+      progress.bolum6 = true;
+      localStorage.setItem('progress', JSON.stringify(progress));
+
+      setTimeout(showCompletion, 1200);
+    } else {
+      input.classList.add('error');
+      const attempt = parseInt(localStorage.getItem('b6_attempts') || '0');
+      const hints = [
+        'Yanlış. Formül: (0.87 − 0.12) / 0.87 × 100',
+        'Tekrar dene. 0.87 − 0.12 = 0.75. Bunu 0.87\'ye böl.',
+        'Neredeyse: 0.75 / 0.87 ≈ 0.862. Bunu 100 ile çarp ve yuvarla.'
+      ];
+      feedback.textContent = hints[Math.min(attempt, hints.length - 1)];
+      feedback.className = 'final-feedback wrong';
+      localStorage.setItem('b6_attempts', attempt + 1);
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  function showCompletion() {
+    document.getElementById('completionScreen').classList.add('active');
+    document.getElementById('completionScreen').style.animation = 'popIn 0.5s ease forwards';
+  }
+
+  document.getElementById('finalInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkFinal();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="tr" style="color-scheme: light only;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bölüm V — Üç Fabrika, Bir Hata | İstatistik Hikayeleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e1a14;
+    --paper: #f0f5f2;
+    --aged: #deeae3;
+    --accent: #1a5c38;
+    --accent2: #0f3d26;
+    --gold: #b8860b;
+    --muted: #5a7060;
+    --math-bg: #eef6f1;
+    --math-border: #1a5c38;
+    --highlight: #d4edda;
+    --green: #1a6b3a;
+    --red: #b5292a;
+    color-scheme: light only;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--aged) !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px; line-height: 1.85; min-height: 100vh;
+  }
+
+  /* KİLİT EKRANI */
+  #lockScreen {
+    display:none; position:fixed; inset:0;
+    background:#0e1a14; z-index:9999;
+    flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:40px;
+  }
+  #lockScreen.active { display:flex; }
+  .lock-screen-icon { font-size:64px; margin-bottom:24px; }
+  .lock-screen-title {
+    font-family:'Playfair Display',serif;
+    font-size:28px; color:#f0f5f2; margin-bottom:12px;
+  }
+  .lock-screen-desc {
+    font-size:16px; color:rgba(240,245,242,0.5);
+    max-width:400px; line-height:1.7; margin-bottom:32px;
+  }
+  .lock-screen-btn {
+    display:inline-block; background:#b8860b; color:#0e1a14;
+    font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+    padding:14px 36px; border-radius:8px; text-decoration:none;
+  }
+  .lock-screen-btn:hover { opacity:0.85; }
+
+  /* NAV */
+  nav {
+    background:var(--ink);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 40px; height:52px;
+    border-bottom:2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family:'Playfair Display',serif; font-size:14px; font-weight:700;
+    color:var(--paper); text-decoration:none; letter-spacing:0.04em;
+  }
+  .nav-brand span { color:var(--gold); }
+  .nav-back {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.12em; text-transform:uppercase;
+    color:rgba(240,245,242,0.5); text-decoration:none; transition:color 0.2s;
+  }
+  .nav-back:hover { color:var(--gold); }
+
+  .progress-bar { height:4px; background:rgba(184,134,11,0.15); }
+  .progress-fill { height:100%; background:var(--gold); width:83.3%; transition:width 0.6s ease; }
+
+  .page { max-width:720px; margin:0 auto; padding:56px 40px 100px; }
+
+  .prev-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(26,107,58,0.1); border:1px solid rgba(26,107,58,0.25);
+    border-radius:20px; padding:6px 14px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.08em; color:var(--green); margin-bottom:32px;
+    text-decoration:none;
+  }
+  .prev-badge:hover { background:rgba(26,107,58,0.18); }
+
+  .chapter-eyebrow {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.25em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .chapter-eyebrow::before {
+    content:''; width:24px; height:1px; background:var(--gold); display:inline-block;
+  }
+  .chapter-title {
+    font-family:'Playfair Display',serif; font-size:42px; font-weight:700;
+    line-height:1.15; margin-bottom:8px;
+    opacity:0; animation:fadeUp 0.8s 0.1s ease forwards;
+  }
+  .chapter-subtitle {
+    font-size:16px; font-style:italic; color:var(--muted); margin-bottom:48px;
+    opacity:0; animation:fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  .character-card {
+    background:white; border-left:4px solid var(--accent);
+    padding:20px 24px; margin:40px 0;
+    border-radius:0 8px 8px 0; box-shadow:3px 3px 0 var(--aged);
+  }
+  .character-card .label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px;
+  }
+  .character-name {
+    font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:4px;
+  }
+  .character-desc { font-size:14px; color:var(--muted); line-height:1.6; }
+
+  p { margin-bottom:1.4em; }
+  .divider { display:flex; align-items:center; gap:16px; margin:28px 0; }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider-symbol { color:var(--gold); font-size:16px; }
+
+  .dialogue { margin:20px 0; padding:0 0 0 20px; border-left:3px solid var(--aged); }
+  .speaker {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:3px;
+  }
+  .speech { font-style:italic; color:#1a2e1e; }
+
+  /* ÜÇLÜ FABRİKA KARŞILAŞTIRMA */
+  .factory-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin:16px 0;
+  }
+  .factory-card {
+    background:white; border-radius:8px; padding:16px 18px;
+    border-top:4px solid transparent; text-align:center;
+  }
+  .factory-card.a { border-top-color:#1a5c38; }
+  .factory-card.b { border-top-color:#b8860b; }
+  .factory-card.c { border-top-color:#b5292a; }
+  .factory-label {
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    letter-spacing:0.15em; text-transform:uppercase; margin-bottom:8px;
+  }
+  .factory-card.a .factory-label { color:#1a5c38; }
+  .factory-card.b .factory-label { color:#b8860b; }
+  .factory-card.c .factory-label { color:#b5292a; }
+  .factory-name {
+    font-family:'Playfair Display',serif; font-size:17px; font-weight:700; margin-bottom:10px;
+  }
+  .factory-stat {
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.9; color:var(--ink);
+  }
+  .factory-stat span { color:var(--muted); font-size:11px; display:block; }
+
+  /* Sütun grafiği */
+  .bar-chart {
+    background:white; border-radius:8px; padding:20px 24px;
+    margin:16px 0; border:1px solid rgba(26,92,56,0.15);
+  }
+  .bar-row {
+    display:flex; align-items:center; gap:12px; margin-bottom:12px;
+  }
+  .bar-row:last-child { margin-bottom:0; }
+  .bar-label {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    width:80px; flex-shrink:0; color:var(--muted);
+  }
+  .bar-track {
+    flex:1; height:28px; background:#f0f0f0; border-radius:4px; overflow:hidden;
+    position:relative;
+  }
+  .bar-fill {
+    height:100%; border-radius:4px;
+    display:flex; align-items:center; padding-left:10px;
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    color:white; font-weight:600; transition:width 0.8s ease;
+  }
+  .bar-fill.a { background:#1a5c38; }
+  .bar-fill.b { background:#b8860b; }
+  .bar-fill.c { background:#b5292a; }
+  /* Genel ortalama çizgisi */
+  .bar-mean-line {
+    position:absolute; top:0; bottom:0; width:2px;
+    background:rgba(0,0,0,0.25);
+  }
+  .bar-mean-line::after {
+    content:'x̄'; position:absolute; top:-18px; left:-4px;
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--muted);
+  }
+
+  .stat-box {
+    background:var(--math-bg); border:1px solid var(--math-border);
+    border-radius:8px; padding:24px 28px; margin:32px 0;
+    position:relative; overflow:hidden;
+  }
+  .stat-box::before {
+    content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+    background:var(--math-border);
+  }
+  .stat-box .box-title {
+    font-family:'Playfair Display',serif; font-size:13px; font-weight:700;
+    letter-spacing:0.05em; color:var(--math-border); text-transform:uppercase;
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .stat-box .box-title::after {
+    content:''; flex:1; height:1px; background:var(--math-border); opacity:0.3;
+  }
+  .formula {
+    font-family:'JetBrains Mono',monospace; font-size:14px;
+    background:white; padding:12px 16px; border-radius:4px;
+    margin:10px 0; border:1px solid rgba(26,92,56,0.2);
+    overflow-x:auto; line-height:1.7; color:var(--ink);
+  }
+  .formula .comment { color:var(--muted); font-size:12px; }
+  .formula strong { color:var(--accent2); }
+
+  /* ANOVA tablosu */
+  .anova-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  .anova-table th {
+    background:var(--accent2); color:white; padding:9px 12px; text-align:left;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em;
+  }
+  .anova-table td {
+    padding:9px 12px; border-bottom:1px solid rgba(26,92,56,0.12);
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink);
+  }
+  .anova-table tr:nth-child(even) td { background:rgba(26,92,56,0.04); }
+  .anova-table .total-row td {
+    background:rgba(26,92,56,0.08); font-weight:700;
+    border-top:2px solid var(--math-border);
+  }
+  .anova-table .result-row td {
+    background:var(--highlight); font-weight:700;
+    border-top:2px solid var(--math-border);
+    color:var(--accent2);
+  }
+
+  .data-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  .data-table th {
+    background:var(--accent2); color:white; padding:9px 12px; text-align:left;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em;
+  }
+  .data-table td {
+    padding:8px 12px; border-bottom:1px solid rgba(26,92,56,0.12);
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink);
+  }
+  .data-table tr:nth-child(even) td { background:rgba(26,92,56,0.04); }
+  .data-table .hl td { background:var(--highlight); font-weight:600; }
+
+  .thinking-box {
+    background:white; border:1px dashed var(--gold);
+    border-radius:8px; padding:18px 22px; margin:24px 0; position:relative;
+  }
+  .thinking-box::before {
+    content:'💭'; position:absolute; top:-13px; left:18px;
+    font-size:20px; background:var(--aged); padding:0 6px;
+  }
+  .thinking-box .thinking-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;
+  }
+  .thinking-box p { margin-bottom:0.5em; font-size:16px; color:#1a2e1e; }
+
+  .conclusion-box {
+    background:linear-gradient(135deg, #0e1a14, #1a3020);
+    color:#f0f5f2; padding:28px 32px; border-radius:12px; margin:36px 0;
+    border:1px solid rgba(184,134,11,0.4);
+  }
+  .conclusion-box .conclusion-label {
+    font-family:'Playfair Display',serif; font-size:11px;
+    letter-spacing:0.3em; text-transform:uppercase; color:#f0c040; margin-bottom:10px;
+  }
+  .conclusion-box .conclusion-text {
+    font-family:'Playfair Display',serif; font-size:19px;
+    font-style:italic; line-height:1.6; color:#f0f5f2;
+  }
+
+  .exercise-box {
+    border:2px solid var(--accent); border-radius:12px; padding:24px 28px; margin:40px 0 0;
+  }
+  .exercise-box .ex-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:18px;
+  }
+  .ex-badge {
+    background:var(--accent); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase; padding:4px 10px; border-radius:20px;
+  }
+  .ex-title {
+    font-family:'Playfair Display',serif; font-size:18px; font-weight:700;
+  }
+  .exercise-box ol { padding-left:22px; }
+  .exercise-box ol li { margin-bottom:12px; line-height:1.7; }
+  .hint {
+    background:#fffbeb; border:1px solid #f59e0b; border-radius:6px;
+    padding:12px 16px; margin-top:18px; font-size:14px; color:#92400e;
+  }
+  .hint::before { content:'💡 İpucu: '; font-weight:600; }
+
+  /* KİLİT SİSTEMİ */
+  .unlock-section {
+    margin-top:48px; background:white;
+    border:2px solid var(--ink); border-radius:12px; overflow:hidden;
+  }
+  .unlock-header {
+    background:var(--ink); padding:20px 28px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .lock-icon { font-size:26px; }
+  .unlock-header-text h3 {
+    font-family:'Playfair Display',serif; font-size:20px;
+    color:var(--paper); margin-bottom:2px;
+  }
+  .unlock-header-text p {
+    font-size:13px; color:rgba(240,245,242,0.55); font-style:italic; margin:0;
+  }
+  .unlock-body { padding:28px; }
+  .unlock-question {
+    background:var(--math-bg); border-left:4px solid var(--math-border);
+    padding:16px 20px; border-radius:0 8px 8px 0;
+    margin-bottom:24px; font-size:16px; line-height:1.7; color:var(--ink);
+  }
+  .unlock-question strong { color:var(--math-border); }
+  .unlock-input-row {
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  .unlock-label {
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
+  }
+  .unlock-input {
+    font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600;
+    width:130px; text-align:center; padding:10px 12px;
+    border:2px solid #c8d8c0; border-radius:8px;
+    background:white; color:var(--ink); outline:none; transition:border-color 0.2s;
+  }
+  .unlock-input:focus { border-color:var(--math-border); }
+  .unlock-input.error { border-color:var(--red); animation:shake 0.4s ease; }
+  .unlock-input.success { border-color:var(--green); }
+  .unlock-btn {
+    background:var(--math-border); color:white;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:12px 24px; border:none; border-radius:8px;
+    cursor:pointer; transition:background 0.2s, transform 0.1s;
+  }
+  .unlock-btn:hover { background:var(--accent2); }
+  .unlock-btn:active { transform:scale(0.97); }
+  .unlock-feedback {
+    margin-top:14px; font-size:15px; min-height:24px;
+    font-style:italic; color:var(--muted);
+  }
+  .unlock-feedback.wrong { color:var(--red); }
+  .unlock-feedback.correct { color:var(--green); font-weight:600; }
+
+  .next-chapter-unlocked {
+    display:none; margin-top:28px;
+    background:linear-gradient(135deg, #1a6b3a, #0f4a28);
+    border-radius:10px; padding:24px 28px; text-align:center;
+  }
+  .next-chapter-unlocked.visible { display:block; animation:fadeUp 0.6s ease forwards; }
+  .next-unlocked-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color:rgba(255,255,255,0.6); margin-bottom:8px;
+  }
+  .next-unlocked-title {
+    font-family:'Playfair Display',serif; font-size:20px;
+    font-style:italic; color:white; margin-bottom:20px; line-height:1.4;
+  }
+  .next-btn {
+    display:inline-block; background:white; color:#1a6b3a;
+    font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+    padding:14px 36px; border-radius:8px; text-decoration:none;
+    transition:transform 0.2s, box-shadow 0.2s;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  }
+  .next-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.25); }
+
+  .completed-badge {
+    display:none; background:rgba(26,107,58,0.1);
+    border:1px solid rgba(26,107,58,0.3); border-radius:8px;
+    padding:12px 20px; margin-top:16px; font-size:14px;
+    color:var(--green); font-style:italic; text-align:center;
+  }
+  .completed-badge.visible { display:block; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    25% { transform:translateX(-6px); }
+    75% { transform:translateX(6px); }
+  }
+  @media (max-width:600px) {
+    .page { padding:36px 20px 80px; }
+    .chapter-title { font-size:30px; }
+    nav { padding:0 20px; }
+    .factory-grid { grid-template-columns:1fr; }
+    .unlock-input-row { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-screen-icon">🔒</div>
+  <div class="lock-screen-title">Bu Bölüm Kilitli</div>
+  <div class="lock-screen-desc">Bölüm V'i okumak için önce Bölüm IV'ü tamamlaman gerekiyor.</div>
+  <a href="bolum4.html" class="lock-screen-btn">← Bölüm IV'e Git</a>
+</div>
+
+<nav>
+  <a class="nav-brand" href="index.html"><span>İ</span>statistik Hikayeleri</a>
+  <a class="nav-back" href="index.html">← Ana Sayfa</a>
+</nav>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="page">
+
+  <a href="bolum4.html" class="prev-badge">✓ Bölüm I–IV tamamlandı &nbsp;·&nbsp; Bölüm V →</a>
+
+  <div class="chapter-eyebrow">Bölüm V</div>
+  <h1 class="chapter-title">Üç Fabrika,<br>Bir Hata</h1>
+  <p class="chapter-subtitle">Tek yönlü ANOVA, F-testi ve gruplar arası varyans analizi üzerine</p>
+
+  <div class="character-card">
+    <div class="label">Bu bölümün karakterleri</div>
+    <div class="character-name">Defne Arslan</div>
+    <div class="character-desc">Bu sefer bir fabrika ziyaretinden döner dönmez masasında veriyle yüzleşiyor.</div>
+    <div style="margin-top:14px">
+      <div class="character-name">Kemal Bey</div>
+      <div class="character-desc">Üç fabrikası olan bir üretim şirketinin genel müdürü. "Kalite farkı yok" diyor ama rakamlar farklı söylüyor.</div>
+    </div>
+  </div>
+
+  <p>Kemal Bey kapıya geldiğinde Defne Hoca tam öğle yemeğinden dönmüştü. Adam elindeki zarfı masaya bıraktı.</p>
+
+  <div class="dialogue">
+    <div class="speaker">Kemal Bey</div>
+    <div class="speech">"Defne Hanım, kalite kontrol müdürümüz üç fabrikamızın çıktı kalitesini ölçmüş. Bana 'fabrikalar arasında fark var' diyor. Ben 'yoktur' diyorum. Hangimiz haklı?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Veri nerede?"</div>
+  </div>
+
+  <p>Zarfı açtı. Her fabrikadan 8'er ölçüm, toplam 24 gözlem. Ölçüm birimi: ürün sertlik skoru (0–100).</p>
+
+  <div class="stat-box">
+    <div class="box-title">🏭 Ham Veri — Fabrika Sertlik Skorları</div>
+    <div class="factory-grid">
+      <div class="factory-card a">
+        <div class="factory-label">Fabrika A</div>
+        <div class="factory-name">Ankara</div>
+        <div class="factory-stat">
+          72, 75, 71, 74, 73, 76, 70, 75
+          <span>x̄ₐ = 73.3 &nbsp;|&nbsp; sₐ = 2.1</span>
+        </div>
+      </div>
+      <div class="factory-card b">
+        <div class="factory-label">Fabrika B</div>
+        <div class="factory-name">Bursa</div>
+        <div class="factory-stat">
+          68, 71, 69, 72, 70, 67, 71, 68
+          <span>x̄ᵦ = 69.5 &nbsp;|&nbsp; sᵦ = 1.8</span>
+        </div>
+      </div>
+      <div class="factory-card c">
+        <div class="factory-label">Fabrika C</div>
+        <div class="factory-name">İzmir</div>
+        <div class="factory-stat">
+          76, 78, 74, 77, 79, 75, 78, 77
+          <span>x̄꜀ = 76.8 &nbsp;|&nbsp; s꜀ = 1.7</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar-chart" style="margin-top:16px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:0.08em;text-transform:uppercase;">Ortalama Sertlik Skoru (Genel Ort: 73.2)</div>
+      <div class="bar-row">
+        <div class="bar-label">Fabrika A</div>
+        <div class="bar-track">
+          <div class="bar-fill a" style="width:73.3%">73.3</div>
+          <div class="bar-mean-line" style="left:73.2%"></div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Fabrika B</div>
+        <div class="bar-track">
+          <div class="bar-fill b" style="width:69.5%">69.5</div>
+          <div class="bar-mean-line" style="left:73.2%"></div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Fabrika C</div>
+        <div class="bar-track">
+          <div class="bar-fill c" style="width:76.8%">76.8</div>
+          <div class="bar-mean-line" style="left:73.2%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Kemal Bey</div>
+    <div class="speech">"Bakın, hepsi 70 civarı. Fark küçük."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"7 puanlık fark küçük değil. Ama sizi dinliyorum — bunu test etmemiz gerekiyor. Sadece gözle bakmak yanıltıcı olabilir."</div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">—</span></div>
+
+  <div class="thinking-box">
+    <div class="thinking-label">Defne düşünüyor</div>
+    <p>Üç grup, sürekli ölçüm. İkiden fazla grup var — t-testi değil, <strong>ANOVA</strong> kullanmalıyım.</p>
+    <p>Temel fikir: Gruplar arası değişkenliği, grup içi değişkenlikle karşılaştır.</p>
+    <p>H₀: μₐ = μᵦ = μ꜀ &nbsp;→&nbsp; "Üç fabrikanın ortalaması eşit"</p>
+    <p>H₁: En az bir ortalama farklı</p>
+    <p>Test istatistiği: <strong>F = MS_between / MS_within</strong></p>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">🔬 ANOVA Hesaplama Adımları</div>
+
+    <p style="margin-bottom:8px;font-size:15px;"><strong>1. Genel ortalama:</strong></p>
+    <div class="formula">
+x̄ = (73.3 × 8 + 69.5 × 8 + 76.8 × 8) / 24
+  = (586.4 + 556.0 + 614.4) / 24
+  = 1756.8 / 24
+  <strong>≈ 73.2</strong>
+    </div>
+
+    <p style="margin:14px 0 8px;font-size:15px;"><strong>2. Gruplar arası kareler toplamı (SS_between):</strong></p>
+    <div class="formula">
+SS_B = Σ nᵢ(x̄ᵢ - x̄)²
+     = 8·(73.3-73.2)² + 8·(69.5-73.2)² + 8·(76.8-73.2)²
+     = 8·(0.01) + 8·(13.69) + 8·(12.96)
+     = 0.08 + 109.52 + 103.68
+     <strong>= 213.28</strong>
+    </div>
+
+    <p style="margin:14px 0 8px;font-size:15px;"><strong>3. Grup içi kareler toplamı (SS_within):</strong></p>
+    <div class="formula">
+SS_W = Σ(n-1)·sᵢ²
+     = 7·(2.1²) + 7·(1.8²) + 7·(1.7²)
+     = 7·4.41 + 7·3.24 + 7·2.89
+     = 30.87 + 22.68 + 20.23
+     <strong>= 73.78</strong>
+    </div>
+
+    <p style="margin:14px 0 8px;font-size:15px;"><strong>4. ANOVA tablosu:</strong></p>
+    <table class="anova-table">
+      <thead>
+        <tr><th>Kaynak</th><th>SS</th><th>df</th><th>MS</th><th>F</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Gruplar arası</td><td>213.28</td><td>2</td><td>106.64</td><td rowspan="2" style="vertical-align:middle;font-size:18px;font-weight:700;color:var(--accent)">F = <strong>30.93</strong></td>
+        </tr>
+        <tr>
+          <td>Grup içi</td><td>73.78</td><td>21</td><td>3.51</td>
+        </tr>
+        <tr class="total-row">
+          <td>Toplam</td><td>287.06</td><td>23</td><td>—</td><td>—</td>
+        </tr>
+        <tr class="result-row">
+          <td colspan="3">F(2,21) kritik değeri (α=0.05)</td><td colspan="2">3.47</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;font-size:15px;color:var(--accent2);">
+      <strong>F = 30.93 &gt; F_kritik = 3.47 &nbsp;→&nbsp; H₀ reddedilir!</strong>
+    </p>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"F değeri 30.93. Kritik değer 3.47. Neredeyse dokuz katı. H₀'ı çok güçlü biçimde reddediyoruz."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Kemal Bey</div>
+    <div class="speech">"Yani fabrikalar arasında gerçekten fark var?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Kesinlikle. Ama ANOVA bize hangi fabrikaların birbirinden farklı olduğunu söylemez — sadece 'en az bir çift farklı' der. Hangilerini bulmak için post-hoc testi gerekir."</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Kemal Bey</div>
+    <div class="speech">"Post-hoc testi?"</div>
+  </div>
+
+  <div class="dialogue">
+    <div class="speaker">Defne</div>
+    <div class="speech">"Tukey testi gibi yöntemler. Üçlü karşılaştırma yapar: A-B, A-C, B-C. Grafiğe bakınca Fabrika B ötekilerin altında, C üstünde. Muhtemelen üçü de birbirinden farklı."</div>
+  </div>
+
+  <div class="stat-box">
+    <div class="box-title">📈 Neden t-Testi Yetmez?</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Karşılaştırma</th><th>Yöntem</th><th>Tip I Hata (α)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2 grup</td><td>t-testi (tek)</td><td>%5</td></tr>
+        <tr><td>3 grup, 3 ayrı t-testi</td><td>t-testi (tekrarlı)</td><td style="color:var(--red);font-weight:600">%14.3 — şişirilmiş!</td></tr>
+        <tr class="hl"><td>3 grup</td><td>ANOVA (tek F-testi)</td><td style="color:var(--green);font-weight:600">%5 — kontrollü ✓</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px;font-size:14px;color:var(--muted);">Her ek t-testi Tip I hata olasılığını şişirir. ANOVA bunu tek seferde kontrol altında tutar.</p>
+  </div>
+
+  <div class="conclusion-box">
+    <div class="conclusion-label">Bu bölümün dersi</div>
+    <div class="conclusion-text">
+      "İkiden fazla grubu karşılaştırırken t-testini tekrarlamak hatayı biriktirir. ANOVA, gruplar arası farkı tek seferde ve kontrollü biçimde test eder."
+      <div style="margin-top:14px;font-size:13px;font-style:normal;color:#b8d4c0;letter-spacing:0.05em">— Defne Arslan</div>
+    </div>
+  </div>
+
+  <div class="exercise-box">
+    <div class="ex-header">
+      <span class="ex-badge">Alıştırma</span>
+      <span class="ex-title">Şimdi sıra sende</span>
+    </div>
+    <ol>
+      <li>
+        ANOVA tablosundan <strong>F istatistiğini</strong> tekrar hesaplayın:
+        MS_between = 106.64, MS_within = 3.51. F = ?
+      </li>
+      <li>
+        3 grup yerine <strong>4 grup</strong> olsaydı, üç ayrı t-testi yerine kaç t-testi gerekirdi?
+        Ve bu durumda şişirilmiş Tip I hata olasılığı ne olurdu? (α=0.05)
+      </li>
+      <li>
+        <em>(Zorlayıcı)</em> ANOVA sadece "en az bir fark var" der. Hangi fabrikaların birbirinden farklı olduğunu bulmak için hangi post-hoc testini kullanırdınız ve neden?
+      </li>
+    </ol>
+    <div class="hint">F = MS_between / MS_within &nbsp;|&nbsp; 4 grup için karşılaştırma sayısı: C(4,2) = 6 &nbsp;|&nbsp; Tip I hata: 1 − (0.95)⁶ ≈ ?</div>
+  </div>
+
+  <!-- KİLİT SİSTEMİ -->
+  <div class="unlock-section">
+    <div class="unlock-header">
+      <div class="lock-icon" id="lockIcon">🔒</div>
+      <div class="unlock-header-text">
+        <h3>Bölüm VI'nın Kilidi</h3>
+        <p>Son bölüm — soruyu çöz, kilidi aç</p>
+      </div>
+    </div>
+    <div class="unlock-body">
+      <div class="unlock-question">
+        1. alıştırmadan: <strong>F = MS_between / MS_within = 106.64 / 3.51</strong><br><br>
+        Sonucu <strong>virgülden sonra iki basamak</strong> olarak girin.<br>
+        <em style="font-size:14px;color:var(--muted);">(Örnek: 28.45 ise → 28.45 girin — yuvarlama toleransı ±0.5)</em>
+      </div>
+      <div class="unlock-input-row">
+        <span class="unlock-label">F =</span>
+        <input type="text" class="unlock-input" id="unlockInput" placeholder="0.00">
+        <button class="unlock-btn" onclick="checkAnswer()">Kontrol Et →</button>
+      </div>
+      <div class="unlock-feedback" id="unlockFeedback"></div>
+
+      <div class="next-chapter-unlocked" id="nextChapter">
+        <div class="next-unlocked-label">🎉 Doğru! Son bölümün kilidi açıldı</div>
+        <div class="next-unlocked-title">"Suçlu Kim?"<br>
+          <span style="font-size:15px;font-style:normal;opacity:0.8">Mahkemede veriler konuşuyor — ama korelasyon kanıt mı?</span>
+        </div>
+        <a href="bolum6.html" class="next-btn">Son Bölüme Geç →</a>
+      </div>
+
+      <div class="completed-badge" id="completedBadge">
+        ✓ Bu bölümü daha önce tamamladınız — Son bölüm zaten açık!
+        <br><a href="bolum6.html" style="color:var(--green);font-weight:600;">Bölüm VI'ya Git →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('bolum4_completed') !== 'true') {
+      document.getElementById('lockScreen').classList.add('active');
+    }
+    if (localStorage.getItem('bolum5_completed') === 'true') {
+      document.getElementById('completedBadge').classList.add('visible');
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+    }
+  });
+
+  function checkAnswer() {
+    const input    = document.getElementById('unlockInput');
+    const feedback = document.getElementById('unlockFeedback');
+    const raw      = input.value.trim().replace(',', '.');
+    const val      = parseFloat(raw);
+
+    // F = 106.64 / 3.51 = 30.38 (tam hesap)
+    // Yuvarlama toleransı: 30.0 – 31.5 arası kabul
+    input.classList.remove('error', 'success');
+
+    if (isNaN(val)) {
+      feedback.textContent = 'Lütfen sayısal bir değer girin (örnek: 30.38)';
+      feedback.className = 'unlock-feedback wrong';
+      return;
+    }
+
+    if (val >= 29.5 && val <= 31.5) {
+      input.classList.add('success');
+      feedback.textContent = 'Doğru! F ≈ 30.4 — kritik değerin (3.47) yaklaşık 9 katı. Güçlü bir red!';
+      feedback.className = 'unlock-feedback correct';
+      document.getElementById('lockIcon').textContent = '🔓';
+      document.getElementById('nextChapter').classList.add('visible');
+      localStorage.setItem('bolum5_completed', 'true');
+      const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+      progress.bolum5 = true;
+      localStorage.setItem('progress', JSON.stringify(progress));
+    } else {
+      input.classList.add('error');
+      const attempt = parseInt(localStorage.getItem('b5_attempts') || '0');
+      const hints = [
+        'Yanlış. F = MS_between ÷ MS_within = 106.64 ÷ 3.51',
+        'Tekrar dene. 106.64 ÷ 3.51 — bölmeyi dikkatlice yap.',
+        'İpucu: 100 ÷ 3.51 ≈ 28.5, 6.64 ÷ 3.51 ≈ 1.9. Topla.'
+      ];
+      feedback.textContent = hints[Math.min(attempt, hints.length - 1)];
+      feedback.className = 'unlock-feedback wrong';
+      localStorage.setItem('b5_attempts', attempt + 1);
+      setTimeout(() => input.classList.remove('error'), 500);
+    }
+  }
+
+  document.getElementById('unlockInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkAnswer();
+  });
+</script>
+</body>
+</html>
