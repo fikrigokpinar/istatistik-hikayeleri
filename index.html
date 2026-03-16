@@ -3,938 +3,602 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>İstatistik Hikayeleri — Defne Arslan Vakası</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>İstatistik Hikayeleri — Defne Arslan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream:   #f7f2e8;
-    --paper:   #ede6d3;
-    --ink:     #1c1609;
-    --muted:   #6b6050;
-    --red:     #b5292a;
-    --navy:    #1e3a5f;
-    --gold:    #c49a1a;
-    --gold-lt: #e8c84a;
-    --border:  #d4c9b0;
-    color-scheme: light only;
-  }
-
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--cream);
-    color: var(--ink);
-    font-family: 'Lora', Georgia, serif;
-    font-size: 17px;
-    line-height: 1.75;
-    min-height: 100vh;
-  }
-
-  /* ── Grain overlay ── */
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 999;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-    opacity: 0.5;
-  }
-
-  /* ══════════════════════════════
-     NAV
-  ══════════════════════════════ */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--ink);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 48px;
-    height: 56px;
-    border-bottom: 2px solid var(--gold);
-  }
-
-  .nav-brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--cream);
-    text-decoration: none;
-  }
-
-  .nav-brand span { color: var(--gold); }
-
-  .nav-links {
-    display: flex; gap: 32px; list-style: none;
-  }
-
-  .nav-links a {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(247,242,232,0.65);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--gold-lt); }
-
-  /* ══════════════════════════════
-     HERO
-  ══════════════════════════════ */
-  .hero {
-    position: relative;
-    background: var(--ink);
-    color: var(--cream);
-    overflow: hidden;
-    padding: 100px 48px 90px;
-  }
-
-  /* Dekoratif çizgiler */
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 480px; height: 480px;
-    border: 1px solid rgba(196,154,26,0.15);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    top: 20px; right: 20px;
-    width: 320px; height: 320px;
-    border: 1px solid rgba(196,154,26,0.1);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .hero-inner {
-    max-width: 860px;
-    margin: 0 auto;
-    position: relative; z-index: 1;
-    opacity: 0;
-    animation: fadeUp 0.9s 0.1s ease forwards;
-  }
-
-  .hero-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px;
-  }
-
-  .hero-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 32px; height: 1px;
-    background: var(--gold);
-  }
-
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 6vw, 72px);
-    font-weight: 900;
-    line-height: 1.08;
-    margin-bottom: 12px;
-    letter-spacing: -0.01em;
-  }
-
-  .hero-title em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  .hero-subtitle {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(16px, 2.5vw, 22px);
-    font-style: italic;
-    color: rgba(247,242,232,0.6);
-    margin-bottom: 40px;
-    line-height: 1.5;
-  }
-
-  .hero-desc {
-    max-width: 560px;
-    font-size: 16px;
-    color: rgba(247,242,232,0.75);
-    line-height: 1.8;
-    margin-bottom: 48px;
-  }
-
-  .hero-stats {
-    display: flex; gap: 48px;
-    border-top: 1px solid rgba(196,154,26,0.25);
-    padding-top: 32px;
-  }
-
-  .hero-stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--gold);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .hero-stat-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(247,242,232,0.45);
-  }
-
-  /* ══════════════════════════════
-     KARAKTER TANITIM
-  ══════════════════════════════ */
-  .character-strip {
-    background: var(--paper);
-    border-bottom: 1px solid var(--border);
-    padding: 48px;
-  }
-
-  .character-strip-inner {
-    max-width: 860px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
-  }
-
-  .character-intro {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    grid-column: 1 / -1;
-    display: flex; align-items: center; gap: 12px;
-  }
-
-  .character-intro::after {
-    content: '';
-    flex: 1; height: 1px;
-    background: var(--border);
-  }
-
-  .char-card {
-    display: flex; gap: 20px; align-items: flex-start;
-  }
-
-  .char-avatar {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: var(--navy);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--cream);
-    flex-shrink: 0;
-    border: 2px solid var(--gold);
-  }
-
-  .char-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: var(--ink);
-  }
-
-  .char-role {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .char-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.65;
-  }
-
-  /* ══════════════════════════════
-     BÖLÜMLER
-  ══════════════════════════════ */
-  .chapters-section {
-    padding: 72px 48px;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 48px;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 16px;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    font-weight: 700;
-  }
-
-  .section-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  .chapters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 28px;
-  }
-
-  /* Bölüm kartı */
-  .chapter-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    display: flex; flex-direction: column;
-  }
-
-  .chapter-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(28,22,9,0.12);
-  }
-
-  .chapter-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
-
-  .card-top {
-    height: 6px;
-    background: var(--navy);
-  }
-
-  .card-top.red    { background: var(--red); }
-  .card-top.gold   { background: var(--gold); }
-  .card-top.navy   { background: var(--navy); }
-  .card-top.muted  { background: var(--border); }
-
-  .card-body {
-    padding: 28px 28px 20px;
-    flex: 1; display: flex; flex-direction: column;
-  }
-
-  .card-chapter-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.25;
-    margin-bottom: 8px;
-    color: var(--ink);
-  }
-
-  .card-subtitle {
-    font-size: 13px;
-    font-style: italic;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-
-  .card-desc {
-    font-size: 14px;
-    color: #4a4030;
-    line-height: 1.65;
-    flex: 1;
-  }
-
-  .card-footer {
-    padding: 16px 28px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    border-top: 1px solid var(--border);
-    margin-top: 20px;
-  }
-
-  .card-tags {
-    display: flex; gap: 6px; flex-wrap: wrap;
-  }
-
-  .tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 2px;
-    background: var(--paper);
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-
-  .tag.active {
-    background: var(--navy);
-    color: white;
-    border-color: var(--navy);
-  }
-
-  .card-arrow {
-    font-size: 18px;
-    color: var(--navy);
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: all 0.25s ease;
-  }
-
-  /* Yakında kartı */
-  .chapter-card.coming-soon {
-    opacity: 0.6;
-    cursor: default;
-    pointer-events: none;
-  }
-
-  .coming-badge {
-    position: absolute;
-    top: 16px; right: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: var(--paper);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 3px 9px;
-    border-radius: 20px;
-  }
-
-  /* ══════════════════════════════
-     KONULAR ÖZET
-  ══════════════════════════════ */
-  .topics-section {
-    background: var(--navy);
-    color: var(--cream);
-    padding: 72px 48px;
-  }
-
-  .topics-inner {
-    max-width: 860px;
-    margin: 0 auto;
-  }
-
-  .topics-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .topics-subtitle {
-    font-size: 15px;
-    color: rgba(247,242,232,0.55);
-    font-style: italic;
-    margin-bottom: 48px;
-  }
-
-  .topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-  }
-
-  .topic-item {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(196,154,26,0.2);
-    border-radius: 4px;
-    padding: 20px;
-    transition: background 0.2s;
-  }
-
-  .topic-item:hover { background: rgba(255,255,255,0.1); }
-
-  .topic-icon { font-size: 24px; margin-bottom: 10px; }
-
-  .topic-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .topic-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: rgba(247,242,232,0.4);
-  }
-
-  /* ══════════════════════════════
-     NASIL ÇALIŞIR
-  ══════════════════════════════ */
-  .how-section {
-    padding: 72px 48px;
-    background: var(--paper);
-    border-top: 1px solid var(--border);
-  }
-
-  .how-inner {
-    max-width: 860px;
-    margin: 0 auto;
-  }
-
-  .how-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 40px;
-    text-align: center;
-  }
-
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    position: relative;
-  }
-
-  .steps::before {
-    content: '';
-    position: absolute;
-    top: 28px; left: 14%; right: 14%;
-    height: 1px;
-    background: var(--border);
-    z-index: 0;
-  }
-
-  .step {
-    text-align: center;
-    padding: 0 16px;
-    position: relative; z-index: 1;
-  }
-
-  .step-num {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--cream);
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
-    border: 3px solid var(--cream);
-    box-shadow: 0 0 0 1px var(--border);
-  }
-
-  .step-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .step-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  /* ══════════════════════════════
-     FOOTER
-  ══════════════════════════════ */
-  footer {
-    background: var(--ink);
-    color: rgba(247,242,232,0.45);
-    text-align: center;
-    padding: 36px 48px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    border-top: 2px solid var(--gold);
-  }
-
-  footer strong { color: var(--gold); }
-
-  /* ══════════════════════════════
-     ANİMASYON
-  ══════════════════════════════ */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-in {
-    opacity: 0;
-    animation: fadeUp 0.7s ease forwards;
-  }
-
-  /* ══════════════════════════════
-     MOBİL
-  ══════════════════════════════ */
-  @media (max-width: 700px) {
-    nav { padding: 0 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 60px 24px 60px; }
-    .hero-stats { gap: 28px; flex-wrap: wrap; }
-    .character-strip { padding: 36px 24px; }
-    .character-strip-inner { grid-template-columns: 1fr; }
-    .chapters-section { padding: 48px 24px; }
-    .topics-section { padding: 48px 24px; }
-    .how-section { padding: 48px 24px; }
-    .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
-    .steps::before { display: none; }
-    footer { padding: 28px 24px; }
-  }
+:root {
+  --ink:     #0f0d09;
+  --ink2:    #1c1810;
+  --cream:   #f2ead8;
+  --paper:   #e8dfc8;
+  --gold:    #c8960c;
+  --gold-lt: #f0c040;
+  --muted:   #8a7d68;
+  --border:  #3a3228;
+  --red:     #b5292a;
+  --navy:    #1a3355;
+  --green:   #1a6b3a;
+  --purple:  #6b2680;
+  color-scheme: light only;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 18px; line-height: 1.75;
+  min-height: 100vh; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(15,13,9,0.96); backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(200,150,12,0.3);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 52px; height: 58px;
+}
+.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-logo-mark {
+  width: 32px; height: 32px; border: 1.5px solid var(--gold);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--gold);
+}
+.nav-logo-text {
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.06em; color: var(--cream);
+}
+.nav-logo-text em { color: var(--gold); font-style: normal; }
+.nav-progress-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.nav-progress-label span { color: var(--gold-lt); }
+
+/* HERO */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 52px; overflow: hidden;
+}
+.hero-bg-text {
+  position: absolute; bottom: -40px; right: -20px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(160px, 22vw, 280px); font-weight: 900; font-style: italic;
+  line-height: 1; color: transparent;
+  -webkit-text-stroke: 1px rgba(200,150,12,0.07);
+  user-select: none; pointer-events: none; letter-spacing: -0.03em;
+}
+.hero-corner { position: absolute; width: 60px; height: 60px; pointer-events: none; }
+.hero-corner.tl { top:40px; left:52px; border-top:1px solid rgba(200,150,12,0.35); border-left:1px solid rgba(200,150,12,0.35); }
+.hero-corner.br { bottom:40px; right:52px; border-bottom:1px solid rgba(200,150,12,0.35); border-right:1px solid rgba(200,150,12,0.35); }
+.hero-inner { max-width: 800px; position: relative; z-index: 1; }
+.hero-kicker {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 24px; display: flex; align-items: center; gap: 14px;
+  opacity: 0; animation: fadeUp 0.8s 0.1s ease forwards;
+}
+.hero-kicker::before { content:''; width:40px; height:1px; background:var(--gold); }
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 7vw, 88px); font-weight: 900;
+  line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 6px;
+  opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+}
+.hero-title em { font-style: italic; color: var(--gold); display: block; }
+.hero-author {
+  font-family: 'Playfair Display', serif; font-size: clamp(18px,2.5vw,26px);
+  font-style: italic; color: rgba(242,234,216,0.45); margin-bottom: 40px;
+  opacity: 0; animation: fadeUp 0.8s 0.3s ease forwards;
+}
+.hero-desc {
+  max-width: 520px; font-size: 17px; line-height: 1.8;
+  color: rgba(242,234,216,0.65); margin-bottom: 52px;
+  opacity: 0; animation: fadeUp 0.8s 0.4s ease forwards;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--gold); color: var(--ink);
+  font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700;
+  padding: 16px 36px; border-radius: 3px; text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  opacity: 0; animation: fadeUp 0.8s 0.5s ease forwards;
+}
+.hero-cta:hover { background: var(--gold-lt); transform: translateY(-2px); }
+.hero-cta-arrow { font-size: 20px; transition: transform 0.2s; }
+.hero-cta:hover .hero-cta-arrow { transform: translateX(4px); }
+.scroll-hint {
+  position: absolute; bottom: 40px; left: 52px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(200,150,12,0.35);
+  opacity: 0; animation: fadeUp 1s 0.9s ease forwards;
+}
+.scroll-hint::after {
+  content: ''; width: 1px; height: 40px;
+  background: linear-gradient(to bottom, rgba(200,150,12,0.35), transparent);
+}
+
+/* KARAKTERLER */
+.characters-section {
+  position: relative; z-index: 1;
+  background: var(--ink2); border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); padding: 80px 52px;
+}
+.section-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 48px; display: flex; align-items: center; gap: 16px;
+}
+.section-label::after {
+  content:''; flex:1; max-width:200px; height:1px;
+  background: linear-gradient(to right, rgba(200,150,12,0.4), transparent);
+}
+.characters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; max-width: 900px; }
+.char-panel {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  padding: 36px 40px; position: relative; overflow: hidden; transition: background 0.3s;
+}
+.char-panel:hover { background: rgba(255,255,255,0.04); }
+.char-panel::before {
+  content:''; position:absolute; top:0; left:0; width:3px; height:100%;
+}
+.char-panel.defne::before { background: var(--gold); }
+.char-panel.mert::before  { background: var(--red); }
+.char-initial {
+  font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900;
+  line-height: 1; margin-bottom: 16px; opacity: 0.12;
+  position: absolute; top: 20px; right: 28px;
+}
+.char-panel.defne .char-initial { color: var(--gold); }
+.char-panel.mert  .char-initial { color: var(--red); }
+.char-role {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px;
+}
+.char-panel.defne .char-role { color: var(--gold); }
+.char-panel.mert  .char-role { color: var(--red); }
+.char-name {
+  font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700;
+  margin-bottom: 12px; color: var(--cream);
+}
+.char-desc { font-size: 15px; line-height: 1.7; color: rgba(242,234,216,0.6); }
+
+/* VAKA DOSYALARI */
+.cases-section { position: relative; z-index: 1; padding: 80px 52px; }
+.cases-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 60px; flex-wrap: wrap; gap: 16px;
+}
+.cases-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; }
+.cases-title em { font-style: italic; color: var(--gold); }
+.cases-count {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  letter-spacing: 0.1em; color: var(--muted); padding-bottom: 6px;
+}
+.cases-count span { color: var(--gold-lt); }
+
+/* Timeline */
+.timeline { position: relative; display: flex; flex-direction: column; }
+.timeline::before {
+  content: ''; position: absolute;
+  left: 28px; top: 32px; bottom: 32px; width: 1px;
+  background: linear-gradient(to bottom, var(--gold), rgba(200,150,12,0.08));
+}
+.case-row { display: flex; position: relative; }
+.case-dot {
+  width: 57px; flex-shrink: 0; display: flex;
+  justify-content: center; padding-top: 32px; position: relative; z-index: 1;
+}
+.case-dot-inner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--ink);
+  transition: all 0.4s;
+}
+.case-card {
+  flex: 1; margin: 12px 0; border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden; position: relative;
+  transition: border-color 0.3s, transform 0.25s, box-shadow 0.25s;
+  text-decoration: none; color: inherit; display: flex; flex-direction: column;
+  background: rgba(255,255,255,0.015);
+  cursor: default;
+}
+.case-card.clickable {
+  cursor: pointer;
+}
+.case-card.clickable:hover {
+  border-color: rgba(200,150,12,0.5);
+  transform: translateX(4px);
+  box-shadow: -4px 0 0 var(--gold), 0 8px 32px rgba(0,0,0,0.4);
+}
+.case-card.locked-card { opacity: 0.4; }
+.case-stripe { position: absolute; top:0; left:0; width:3px; height:100%; }
+.case-card-inner { padding: 28px 32px; display: flex; align-items: flex-start; gap: 24px; }
+.case-number-block { flex-shrink: 0; }
+.case-roman {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+}
+.case-num {
+  font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900;
+  line-height: 1; opacity: 0.1; color: var(--cream);
+}
+.case-content { flex: 1; }
+.case-status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+}
+.badge-completed { background: rgba(26,107,58,0.2); color: #4ade80; border: 1px solid rgba(26,107,58,0.4); }
+.badge-next      { background: rgba(200,150,12,0.2); color: var(--gold-lt); border: 1px solid rgba(200,150,12,0.4); animation: pulse 2s infinite; }
+.badge-locked    { background: rgba(58,50,40,0.5); color: var(--muted); border: 1px solid var(--border); }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,150,12,0.3); }
+  50%      { box-shadow: 0 0 0 6px rgba(200,150,12,0); }
+}
+.case-title {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  color: var(--cream); margin-bottom: 4px; line-height: 1.2;
+}
+.case-subtitle { font-size: 14px; font-style: italic; color: var(--muted); margin-bottom: 12px; }
+.case-desc { font-size: 15px; line-height: 1.65; color: rgba(242,234,216,0.5); max-width: 540px; }
+.case-footer {
+  padding: 14px 32px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,0.15);
+}
+.case-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 2px;
+  background: rgba(255,255,255,0.04); color: rgba(242,234,216,0.35);
+  border: 1px solid var(--border);
+}
+.tag.active { background: rgba(200,150,12,0.15); color: var(--gold); border-color: rgba(200,150,12,0.3); }
+.case-arrow {
+  font-size: 18px; color: var(--gold); opacity: 0;
+  transform: translateX(-8px); transition: all 0.25s;
+}
+.case-card.clickable:hover .case-arrow { opacity: 1; transform: translateX(0); }
+
+/* NASIL ÇALIŞIR */
+.how-section {
+  position: relative; z-index: 1;
+  background: var(--ink2); border-top: 1px solid var(--border); padding: 80px 52px;
+}
+.how-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 1px; margin-top: 48px; border: 1px solid var(--border);
+}
+.how-step {
+  background: rgba(255,255,255,0.02); padding: 36px 28px;
+  border-right: 1px solid var(--border); transition: background 0.2s;
+}
+.how-step:last-child { border-right: none; }
+.how-step:hover { background: rgba(255,255,255,0.04); }
+.how-num {
+  font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900;
+  line-height: 1; color: transparent; -webkit-text-stroke: 1px rgba(200,150,12,0.25);
+  margin-bottom: 16px;
+}
+.how-title {
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+  margin-bottom: 8px; color: var(--cream);
+}
+.how-desc { font-size: 14px; line-height: 1.65; color: rgba(242,234,216,0.5); }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1; background: var(--ink);
+  border-top: 1px solid var(--border); padding: 40px 52px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.footer-brand { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--cream); }
+.footer-brand em { color: var(--gold); font-style: normal; }
+.footer-note { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: var(--muted); }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.reveal { opacity:0; transform:translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 60px 24px; min-height: auto; padding-top: 80px; }
+  .hero-bg-text { font-size: 120px; }
+  .hero-corner { display: none; }
+  .characters-section, .cases-section, .how-section { padding: 60px 24px; }
+  .characters-grid { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: 1fr 1fr; }
+  .case-card-inner { gap: 16px; }
+  .case-num { font-size: 32px; }
+  .timeline::before { left: 20px; }
+  .case-dot { width: 41px; }
+  footer { padding: 32px 24px; flex-direction: column; }
+}
+@media (max-width: 480px) {
+  .how-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 44px; }
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <a class="nav-brand" href="#"><span>İ</span>statistik Hikayeleri</a>
-  <ul class="nav-links">
-    <li><a href="#bolumler">Bölümler</a></li>
-    <li><a href="#konular">Konular</a></li>
-    <li><a href="#nasil">Nasıl Çalışır?</a></li>
-  </ul>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">İ</div>
+    <div class="nav-logo-text">İstatistik <em>Hikayeleri</em></div>
+  </a>
+  <div class="nav-progress-label">İlerleme: <span id="navProgress">0 / 6</span></div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-bg-text">istatistik</div>
+  <div class="hero-corner tl"></div>
+  <div class="hero-corner br"></div>
   <div class="hero-inner">
-    <div class="hero-eyebrow">Türkçe İstatistik Eğitimi</div>
-    <h1 class="hero-title">
-      İstatistik<br><em>Hikâyeleri</em>
-    </h1>
-    <p class="hero-subtitle">Defne Arslan Vakası — Gerçek hayatın içinden bulmacalar</p>
+    <div class="hero-kicker">Türkçe · Ücretsiz · İnteraktif</div>
+    <h1 class="hero-title">Defne Arslan<em>Vakaları</em></h1>
+    <p class="hero-author">İstatistik Hikayeleri — 6 Bölüm</p>
     <p class="hero-desc">
-      Süper Lig maçlarından Ankara'nın emlak piyasasına, hastane verilerinden seçim tahminlerine — istatistiği bulmacalar ve hikâyeler üzerinden öğren. Her bölüm bir vaka, her vaka bir ders.
+      Spor verisinden ilaç deneyine, emlak fiyatlarından seçim anketine —
+      istatistiği gerçek hayat bulmacaları üzerinden öğren.
+      Her bölümü bitir, bir sonrakinin kilidini aç.
     </p>
-    <div class="hero-stats">
-      <div>
-        <div class="hero-stat-num">1</div>
-        <div class="hero-stat-label">Yayında bölüm</div>
-      </div>
-      <div>
-        <div class="hero-stat-num">5+</div>
-        <div class="hero-stat-label">Planlanan bölüm</div>
-      </div>
-      <div>
-        <div class="hero-stat-num">%100</div>
-        <div class="hero-stat-label">Türkçe içerik</div>
-      </div>
-      <div>
-        <div class="hero-stat-num">∞</div>
-        <div class="hero-stat-label">Ücretsiz</div>
-      </div>
+    <a href="#vakalar" class="hero-cta">Okumaya Başla <span class="hero-cta-arrow">→</span></a>
+  </div>
+  <div class="scroll-hint">Aşağı kaydır</div>
+</section>
+
+<!-- KARAKTERLERİ TANIYIN -->
+<section class="characters-section">
+  <div class="section-label">Karakterler</div>
+  <div class="characters-grid">
+    <div class="char-panel defne reveal">
+      <div class="char-initial">D</div>
+      <div class="char-role">İstatistik Danışmanı</div>
+      <div class="char-name">Defne Arslan</div>
+      <div class="char-desc">Ankara Üniversitesi İstatistik Bölümü öğretim üyesi. Şirketlere, gazetelere ve mahkemelere danışmanlık yapar. Veriye yanlış bakan herkesi düzelten, sabırsız ama adil biridir. Çayını siyah içer.</div>
+    </div>
+    <div class="char-panel mert reveal" style="transition-delay:0.1s">
+      <div class="char-initial">M</div>
+      <div class="char-role">Lisans Asistanı · 3. Sınıf</div>
+      <div class="char-name">Mert Kaya</div>
+      <div class="char-desc">Defne Hoca'nın öğrencisi ve zaman zaman yardımcısı. Galatasaraylı olduğu için tarafsızlığı zaman zaman sorgulanır. Okuyucu olayları büyük ölçüde onun gözünden takip eder.</div>
     </div>
   </div>
 </section>
 
-<!-- KARAKTER TANITIM -->
-<div class="character-strip">
-  <div class="character-strip-inner">
-    <div class="character-intro">Kadronuz</div>
-
-    <div class="char-card">
-      <div class="char-avatar">D</div>
-      <div>
-        <div class="char-name">Defne Arslan</div>
-        <div class="char-role">İstatistik Danışmanı</div>
-        <div class="char-desc">
-          Ankara Üniversitesi İstatistik Bölümü öğretim üyesi. Şirketlere, gazetelere ve mahkemelere danışmanlık yapar. Çayını siyah içer.
-        </div>
-      </div>
+<!-- VAKA DOSYALARI -->
+<section class="cases-section" id="vakalar">
+  <div class="cases-header reveal">
+    <div>
+      <div class="section-label" style="margin-bottom:12px">Vaka Dosyaları</div>
+      <h2 class="cases-title">Her Bölüm Bir <em>Vaka</em></h2>
     </div>
-
-    <div class="char-card">
-      <div class="char-avatar" style="background: var(--red);">M</div>
-      <div>
-        <div class="char-name">Mert Kaya</div>
-        <div class="char-role">Lisans Asistanı — 3. Sınıf</div>
-        <div class="char-desc">
-          Defne Hoca'nın öğrencisi ve bazen yardımcısı. Galatasaraylı olduğu için tarafsızlığı zaman zaman sorgulanır.
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BÖLÜMLER -->
-<section class="chapters-section" id="bolumler">
-  <div class="section-header">
-    <h2 class="section-title">Bölümler</h2>
-    <span class="section-meta">1 / 6 yayında</span>
+    <div class="cases-count"><span id="completedCount">0</span> / 6 tamamlandı</div>
   </div>
 
-  <div class="chapters-grid">
+  <div class="timeline" id="timeline">
 
-    <!-- Bölüm 1 — YAYINDA -->
-    <a class="chapter-card fade-in" href="bolum1.html" style="animation-delay: 0.1s">
-      <div class="card-top navy"></div>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm I</div>
-        <div class="card-title">Gol mu, Şans mı?</div>
-        <div class="card-subtitle">Hipotez testleri ve sporda istatistik yanılgısı</div>
-        <div class="card-desc">
-          Trabzonspor bu sezon 10 penaltıdan 9'unu gol yaptı. Mert bunu "kesinlikle anlamlı" buluyor. Defne Hoca aynı fikirde mi?
+    <!-- B1 -->
+    <div class="case-row" id="row1">
+      <div class="case-dot"><div class="case-dot-inner" id="dot1"></div></div>
+      <div class="case-card" id="card1">
+        <div class="case-stripe" style="background:var(--navy)"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">I</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge1"></div>
+            <div class="case-title">Gol mu, Şans mı?</div>
+            <div class="case-subtitle">Hipotez testleri ve sporda istatistik yanılgısı</div>
+            <div class="case-desc">Trabzonspor 10 penaltıdan 9'unu attı. Mert "kesinlikle anlamlı" diyor, arkadaşı "saf şans" diyor. Defne Hoca hangisi haklı?</div>
+          </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag active">Hipotez Testi</span>
-          <span class="tag">Binom</span>
-          <span class="tag">P-değeri</span>
-        </div>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <!-- Bölüm 2 — YAKINDA -->
-    <div class="chapter-card coming-soon fade-in" style="animation-delay: 0.2s">
-      <div class="card-top red"></div>
-      <span class="coming-badge">Yakında</span>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm II</div>
-        <div class="card-title">Ev Fiyatı Kehanet mi, Regresyon mu?</div>
-        <div class="card-subtitle">Doğrusal regresyon ve tahmin</div>
-        <div class="card-desc">
-          Ankara'da bir emlakçı, fiyat tahminleri tutmayan modelini Defne'ye getiriyor. Sorun modelde mi, veride mi, yoksa emlakçıda mı?
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag">Regresyon</span>
-          <span class="tag">R²</span>
-          <span class="tag">Tahmin</span>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t1a">Hipotez Testi</span><span class="tag" id="t1b">Binom</span><span class="tag" id="t1c">P-değeri</span></div>
+          <span class="case-arrow">→</span>
         </div>
       </div>
     </div>
 
-    <!-- Bölüm 3 — YAKINDA -->
-    <div class="chapter-card coming-soon fade-in" style="animation-delay: 0.3s">
-      <div class="card-top gold"></div>
-      <span class="coming-badge">Yakında</span>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm III</div>
-        <div class="card-title">İki İlaç, Bir Soru</div>
-        <div class="card-subtitle">İki örneklem t-testi</div>
-        <div class="card-desc">
-          Bir ilaç şirketi yeni ilacının rakibinden daha etkili olduğunu iddia ediyor. Defne klinik deneme verilerine bakar ve gördükleri onu şaşırtır.
+    <!-- B2 -->
+    <div class="case-row" id="row2">
+      <div class="case-dot"><div class="case-dot-inner" id="dot2"></div></div>
+      <div class="case-card" id="card2">
+        <div class="case-stripe" style="background:var(--red)"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">II</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge2"></div>
+            <div class="case-title">Ev Fiyatı Kehanet mi, Regresyon mu?</div>
+            <div class="case-subtitle">Doğrusal regresyon ve tahmin</div>
+            <div class="case-desc">Ankara'da bir emlakçı fiyat tahminleri tutmayan modelini getiriyor. Sorun formülde mi, veride mi, yoksa emlakçıda mı?</div>
+          </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag">t-testi</span>
-          <span class="tag">İki Örneklem</span>
-          <span class="tag">Klinik</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bölüm 4 — YAKINDA -->
-    <div class="chapter-card coming-soon fade-in" style="animation-delay: 0.4s">
-      <div class="card-top muted"></div>
-      <span class="coming-badge">Yakında</span>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm IV</div>
-        <div class="card-title">Yüzde Kaç Aldı?</div>
-        <div class="card-subtitle">Güven aralıkları ve anket yanılgısı</div>
-        <div class="card-desc">
-          Bir gazete anketi "adayın oyları arttı" manşeti atıyor. Ama güven aralığına bakınca Defne başını sallıyor: "Bu manşet yanlış."
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag">Güven Aralığı</span>
-          <span class="tag">Anket</span>
-          <span class="tag">Oran</span>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t2a">Regresyon</span><span class="tag" id="t2b">En Küçük Kareler</span><span class="tag" id="t2c">R²</span></div>
+          <span class="case-arrow">→</span>
         </div>
       </div>
     </div>
 
-    <!-- Bölüm 5 — YAKINDA -->
-    <div class="chapter-card coming-soon fade-in" style="animation-delay: 0.5s">
-      <div class="card-top navy"></div>
-      <span class="coming-badge">Yakında</span>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm V</div>
-        <div class="card-title">Üç Fabrika, Bir Hata</div>
-        <div class="card-subtitle">Tek yönlü ANOVA</div>
-        <div class="card-desc">
-          Üç fabrikadan gelen ürünlerin kalite ölçümleri farklı. Yönetim "aralarında fark yok" diyor. Defne katılmıyor.
+    <!-- B3 -->
+    <div class="case-row" id="row3">
+      <div class="case-dot"><div class="case-dot-inner" id="dot3"></div></div>
+      <div class="case-card" id="card3">
+        <div class="case-stripe" style="background:var(--purple)"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">III</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge3"></div>
+            <div class="case-title">İki İlaç, Bir Soru</div>
+            <div class="case-subtitle">İki örneklem t-testi ve istatistiksel güç</div>
+            <div class="case-desc">Bir ilaç şirketi "yeni ilaç açıkça daha iyi" diyor. Defne klinik veriye bakıyor — gerçekten öyle mi?</div>
+          </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag">ANOVA</span>
-          <span class="tag">F-testi</span>
-          <span class="tag">Varyans</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bölüm 6 — YAKINDA -->
-    <div class="chapter-card coming-soon fade-in" style="animation-delay: 0.6s">
-      <div class="card-top red"></div>
-      <span class="coming-badge">Yakında</span>
-      <div class="card-body">
-        <div class="card-chapter-num">Bölüm VI</div>
-        <div class="card-title">Suçlu Kim?</div>
-        <div class="card-subtitle">Korelasyon ≠ nedensellik</div>
-        <div class="card-desc">
-          Bir mahkeme davası: sanık "veriler beni suçluyor" diyor. Defne verilere bakıyor — ama korelasyon kanıt mıdır?
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags">
-          <span class="tag">Korelasyon</span>
-          <span class="tag">Nedensellik</span>
-          <span class="tag">Hukuk</span>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t3a">t-Testi</span><span class="tag" id="t3b">İki Örneklem</span><span class="tag" id="t3c">İstatistiksel Güç</span></div>
+          <span class="case-arrow">→</span>
         </div>
       </div>
     </div>
 
-  </div>
-</section>
-
-<!-- KONULAR -->
-<section class="topics-section" id="konular">
-  <div class="topics-inner">
-    <h2 class="topics-title">Hangi konular işleniyor?</h2>
-    <p class="topics-subtitle">Her bölüm gerçek hayat verisiyle, Türkiye bağlamında</p>
-    <div class="topics-grid">
-      <div class="topic-item">
-        <div class="topic-icon">⚽</div>
-        <div class="topic-name">Hipotez Testi</div>
-        <div class="topic-count">1 bölüm yayında</div>
-      </div>
-      <div class="topic-item">
-        <div class="topic-icon">🏘️</div>
-        <div class="topic-name">Regresyon</div>
-        <div class="topic-count">Yakında</div>
-      </div>
-      <div class="topic-item">
-        <div class="topic-icon">💊</div>
-        <div class="topic-name">t-Testleri</div>
-        <div class="topic-count">Yakında</div>
-      </div>
-      <div class="topic-item">
-        <div class="topic-icon">📊</div>
-        <div class="topic-name">Güven Aralığı</div>
-        <div class="topic-count">Yakında</div>
-      </div>
-      <div class="topic-item">
-        <div class="topic-icon">🏭</div>
-        <div class="topic-name">ANOVA</div>
-        <div class="topic-count">Yakında</div>
-      </div>
-      <div class="topic-item">
-        <div class="topic-icon">⚖️</div>
-        <div class="topic-name">Korelasyon</div>
-        <div class="topic-count">Yakında</div>
+    <!-- B4 -->
+    <div class="case-row" id="row4">
+      <div class="case-dot"><div class="case-dot-inner" id="dot4"></div></div>
+      <div class="case-card" id="card4">
+        <div class="case-stripe" style="background:#b8860b"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">IV</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge4"></div>
+            <div class="case-title">Yüzde Kaç Aldı?</div>
+            <div class="case-subtitle">Güven aralıkları ve anket yanılgısı</div>
+            <div class="case-desc">Bir gazete "adayın oyları arttı" manşeti atıyor. Ama Defne güven aralığına bakınca başını sallıyor: "Bu manşet yanlış."</div>
+          </div>
+        </div>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t4a">Güven Aralığı</span><span class="tag" id="t4b">Örnekleme Hatası</span><span class="tag" id="t4c">Anket</span></div>
+          <span class="case-arrow">→</span>
+        </div>
       </div>
     </div>
+
+    <!-- B5 -->
+    <div class="case-row" id="row5">
+      <div class="case-dot"><div class="case-dot-inner" id="dot5"></div></div>
+      <div class="case-card" id="card5">
+        <div class="case-stripe" style="background:#1e3a5f"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">V</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge5"></div>
+            <div class="case-title">Üç Fabrika, Bir Hata</div>
+            <div class="case-subtitle">Tek yönlü ANOVA ve varyans analizi</div>
+            <div class="case-desc">Üç fabrikadan gelen ürünlerin kalite ölçümleri farklı görünüyor. Yönetim "fark yok" diyor. Defne F-testini açıyor.</div>
+          </div>
+        </div>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t5a">ANOVA</span><span class="tag" id="t5b">F-Testi</span><span class="tag" id="t5c">Varyans Homojenliği</span></div>
+          <span class="case-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B6 -->
+    <div class="case-row" id="row6">
+      <div class="case-dot"><div class="case-dot-inner" id="dot6"></div></div>
+      <div class="case-card" id="card6">
+        <div class="case-stripe" style="background:#8b1a1a"></div>
+        <div class="case-card-inner">
+          <div class="case-number-block"><div class="case-roman">Bölüm</div><div class="case-num">VI</div></div>
+          <div class="case-content">
+            <div class="case-status-badge" id="badge6"></div>
+            <div class="case-title">Suçlu Kim?</div>
+            <div class="case-subtitle">Korelasyon ≠ nedensellik</div>
+            <div class="case-desc">Bir mahkeme davası: veriler sanığı suçluyor gibi görünüyor. Ama Defne bir soruyor: "Korelasyon kanıt sayılır mı?"</div>
+          </div>
+        </div>
+        <div class="case-footer">
+          <div class="case-tags"><span class="tag" id="t6a">Korelasyon</span><span class="tag" id="t6b">Nedensellik</span><span class="tag" id="t6c">Karıştırıcı Değişken</span></div>
+          <span class="case-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <!-- NASIL ÇALIŞIR -->
-<section class="how-section" id="nasil">
-  <div class="how-inner">
-    <h2 class="how-title">Her bölüm nasıl çalışır?</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-title">Hikâye</div>
-        <div class="step-desc">Gerçekçi bir senaryo ile başla. Defne ve Mert'in diyalogunu oku.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-title">Problem</div>
-        <div class="step-desc">İstatistiksel soruyu anla. Veriyi gör, modeli kur.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-title">Çözüm</div>
-        <div class="step-desc">Adım adım çözümü takip et, formülleri gör.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-title">Alıştırma</div>
-        <div class="step-desc">Bölüm sonundaki soruları çöz ve pekiştir.</div>
-      </div>
-    </div>
+<section class="how-section">
+  <div class="section-label">Sistem</div>
+  <div class="how-grid">
+    <div class="how-step reveal"><div class="how-num">01</div><div class="how-title">Hikâyeyi Oku</div><div class="how-desc">Defne ve müşterisinin diyaloğunu izle. Problem doğal şekilde ortaya çıkar.</div></div>
+    <div class="how-step reveal" style="transition-delay:0.1s"><div class="how-num">02</div><div class="how-title">Kavramı Anla</div><div class="how-desc">Formüller, tablolar ve düşünce adımları adım adım gösterilir.</div></div>
+    <div class="how-step reveal" style="transition-delay:0.2s"><div class="how-num">03</div><div class="how-title">Soruyu Çöz</div><div class="how-desc">Her bölüm bir hesaplama sorusuyla biter. Cevabı girmeden devam edemezsin.</div></div>
+    <div class="how-step reveal" style="transition-delay:0.3s"><div class="how-num">04</div><div class="how-title">Kilidi Aç</div><div class="how-desc">Doğru cevap bir sonraki bölümün kilidini açar. İlerleme tarayıcında saklanır.</div></div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <strong>İstatistik Hikâyeleri</strong> &nbsp;·&nbsp; Gazi Üniversitesi İstatistik Bölümü &nbsp;·&nbsp; Tüm içerikler ücretsizdir
+  <div class="footer-brand">İstatistik <em>Hikayeleri</em></div>
+  <div class="footer-note">Gazi Üniversitesi İstatistik Bölümü &nbsp;·&nbsp; Tüm içerikler ücretsizdir</div>
 </footer>
 
-
 <script>
-window.addEventListener('DOMContentLoaded', function() {
-  const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+const BOLUMLER = [
+  { id:1, key:'bolum1_completed', href:'bolum1.html', prevKey:null },
+  { id:2, key:'bolum2_completed', href:'bolum2.html', prevKey:'bolum1_completed' },
+  { id:3, key:'bolum3_completed', href:'bolum3.html', prevKey:'bolum2_completed' },
+  { id:4, key:'bolum4_completed', href:'bolum4.html', prevKey:'bolum3_completed' },
+  { id:5, key:'bolum5_completed', href:'bolum5.html', prevKey:'bolum4_completed' },
+  { id:6, key:'bolum6_completed', href:'bolum6.html', prevKey:'bolum5_completed' },
+];
 
-  // Bolum 1 tamamlandiysa kart ustune rozet ekle
-  if (progress.bolum1) {
-    const b1 = document.querySelector('a.chapter-card[href="bolum1.html"]');
-    if (b1) {
-      const badge = document.createElement('span');
-      badge.style.cssText = 'position:absolute;top:12px;right:12px;background:#1a6b3a;color:white;font-family:monospace;font-size:10px;text-transform:uppercase;padding:3px 9px;border-radius:20px;z-index:2;';
+function updateUI() {
+  let completed = 0;
+  BOLUMLER.forEach(b => {
+    const isDone    = localStorage.getItem(b.key) === 'true';
+    const prevDone  = b.prevKey ? localStorage.getItem(b.prevKey) === 'true' : true;
+    const card      = document.getElementById('card'  + b.id);
+    const badge     = document.getElementById('badge' + b.id);
+    const dot       = document.getElementById('dot'   + b.id);
+    const tagEls    = [1,2,3].map(i => document.getElementById('t'+b.id+String.fromCharCode(96+i)));
+
+    // Reset
+    card.classList.remove('clickable','locked-card');
+    card.style.opacity = '';
+    card.onclick = null;
+
+    if (isDone) {
+      completed++;
+      dot.style.cssText = 'background:var(--green);border-color:var(--green);box-shadow:0 0 12px rgba(26,107,58,0.5)';
+      badge.className = 'case-status-badge badge-completed';
       badge.textContent = '✓ Tamamlandı';
-      b1.style.position = 'relative';
-      b1.appendChild(badge);
+      card.classList.add('clickable');
+      card.onclick = () => location.href = b.href;
+      tagEls.forEach(t => t && t.classList.add('active'));
+    } else if (prevDone) {
+      dot.style.cssText = 'background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(200,150,12,0.5)';
+      badge.className = 'case-status-badge badge-next';
+      badge.textContent = b.id === 1 ? '▶ Başla' : '▶ Devam Et';
+      card.classList.add('clickable');
+      card.onclick = () => location.href = b.href;
+      tagEls.forEach(t => t && t.classList.add('active'));
+    } else {
+      dot.style.cssText = 'background:var(--ink);border-color:rgba(58,50,40,0.7);box-shadow:none';
+      badge.className = 'case-status-badge badge-locked';
+      badge.textContent = '🔒 Kilitli';
+      card.classList.add('locked-card');
+      tagEls.forEach(t => t && t.classList.remove('active'));
     }
-  }
+  });
 
-  // Bolum 1 tamamlandiysa Bolum 2 kilitli kartini ac
-  const b2card = document.querySelectorAll('.chapter-card.coming-soon')[0];
-  if (b2card) {
-    if (progress.bolum1) {
-      // Tıklanabilir yap
-      b2card.classList.remove('coming-soon');
-      b2card.style.opacity = '1';
-      b2card.style.pointerEvents = 'auto';
-      b2card.style.cursor = 'pointer';
-      b2card.onclick = function() { window.location.href = 'bolum2.html'; };
-      const badge = b2card.querySelector('.coming-badge');
-      if (badge) {
-        if (progress.bolum2) {
-          badge.textContent = '✓ Tamamlandı';
-          badge.style.background = '#1a6b3a';
-          badge.style.color = 'white';
-          badge.style.borderColor = '#1a6b3a';
-        } else {
-          badge.textContent = '🔓 Açık';
-          badge.style.background = '#1e3a5f';
-          badge.style.color = 'white';
-          badge.style.borderColor = '#1e3a5f';
-        }
-      }
-    }
-  }
-});
+  document.getElementById('navProgress').textContent    = completed + ' / 6';
+  document.getElementById('completedCount').textContent = completed;
+}
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries =>
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+  { threshold: 0.1 }
+);
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+updateUI();
 </script>
-
 </body>
 </html>
